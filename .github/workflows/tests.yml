@@ -3,7 +3,7 @@ name: tests
 on:
   push:
     branches:
-      - master
+      - main
       - '*.x'
   pull_request:
   schedule:
@@ -11,16 +11,13 @@ on:
 
 jobs:
   tests:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     strategy:
       fail-fast: true
       matrix:
-        php: [8.2, 8.3, 8.4]
+        php: [8.3, 8.4]
         stability: [prefer-lowest, prefer-stable]
-        exclude:
-          - php: 8.4
-            stability: prefer-lowest
 
     name: PHP ${{ matrix.php }} - ${{ matrix.stability }}
 
@@ -35,10 +32,10 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip
           ini-values: error_reporting=E_ALL
           tools: composer:v2
-          coverage: none
+          coverage: pcov
 
       - name: Install dependencies
         run: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
 
       - name: Execute tests
-        run: vendor/bin/phpunit --display-deprecations --fail-on-deprecation
+        run: vendor/bin/pest --parallel --coverage

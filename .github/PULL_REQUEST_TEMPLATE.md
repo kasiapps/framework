@@ -1,7 +1,7 @@
 <!--
-Please only send a pull request to branches which are currently supported: https://laravel.com/docs/releases#support-policy 
+Please only send a pull request to branches which are currently supported: https://kasiapp.com/docs/releases#support-policy
 
-If you are unsure which branch your pull request should be sent to, please read: https://laravel.com/docs/contributions#which-branch
+If you are unsure which branch your pull request should be sent to, please read: https://kasiapp.com/docs/contributions#which-branch
 
 Pull requests without a descriptive title, thorough description, or tests will be closed.
 

@@ -8,7 +8,7 @@ Only the latest major version receives security fixes.
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability within Laravel, please send an email to Taylor Otwell at taylor@laravel.com. All security vulnerabilities will be promptly addressed.
+If you discover a security vulnerability within Kasi, please send an email to secondman at smv@jetstreamlabs.com. All security vulnerabilities will be promptly addressed.
 
 ### Public PGP Key
 
