@@ -32,10 +32,10 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip
           ini-values: error_reporting=E_ALL
           tools: composer:v2
-          coverage: pcov
+          coverage: none
 
       - name: Install dependencies
         run: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
 
       - name: Execute tests
-        run: vendor/bin/pest --parallel --coverage
+        run: vendor/bin/phpunit --display-deprecations --fail-on-deprecation
