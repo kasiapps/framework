@@ -1,21 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Laravel\Lumen\Routing;
 
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 use Laravel\Lumen\Application;
 
 class UrlGenerator
 {
-  /**
-   * The application instance.
-   *
-   * @var \Laravel\Lumen\Application
-   */
-  protected $app;
-
   /**
    * The forced URL root.
    *
@@ -47,13 +43,14 @@ class UrlGenerator
   /**
    * Create a new URL redirector instance.
    *
-   * @param  \Laravel\Lumen\Application  $app
    * @return void
    */
-  public function __construct(Application $app)
-  {
-    $this->app = $app;
-  }
+  public function __construct(
+    /**
+     * The application instance.
+     */
+    protected Application $app
+  ) {}
 
   /**
    * Get the full URL for the current request.
@@ -147,9 +144,8 @@ class UrlGenerator
    * @param  string  $root
    * @param  string  $path
    * @param  bool|null  $secure
-   * @return string
    */
-  public function assetFrom($root, $path, $secure = null)
+  public function assetFrom($root, $path, $secure = null): string
   {
     // Once we get the root URL, we will check to see if it contains an index.php
     // file in the paths. If it does, we will remove it since it is not needed
@@ -185,11 +181,8 @@ class UrlGenerator
 
   /**
    * Force the schema for URLs.
-   *
-   * @param  string  $schema
-   * @return void
    */
-  public function forceScheme($schema)
+  public function forceScheme(string $schema): void
   {
     $this->cachedSchema = null;
 
@@ -223,19 +216,19 @@ class UrlGenerator
    * @param  bool|null  $secure
    * @return string
    *
-   * @throws \InvalidArgumentException
+   * @throws InvalidArgumentException
    */
   public function route($name, $parameters = [], $secure = null)
   {
     if (! isset($this->app->router->namedRoutes[$name])) {
-      throw new \InvalidArgumentException("Route [{$name}] not defined.");
+      throw new InvalidArgumentException("Route [{$name}] not defined.");
     }
 
     $uri = $this->app->router->namedRoutes[$name];
 
     $parameters = $this->formatParameters($parameters);
 
-    $uri = preg_replace_callback('/\[([^\]]*)\]$/', function ($matches) use ($uri, &$parameters) {
+    $uri = preg_replace_callback('/\[([^\]]*)\]$/', function (array $matches) use ($uri, &$parameters) {
       $uri = $this->replaceRouteParameters($matches[1], $parameters);
 
       return ($matches[1] == $uri) ? '' : $uri;
@@ -245,7 +238,7 @@ class UrlGenerator
 
     $uri = $this->to($uri, [], $secure);
 
-    if (! empty($parameters)) {
+    if ($parameters !== []) {
       $uri .= '?'.http_build_query($parameters);
     }
 
@@ -312,9 +305,9 @@ class UrlGenerator
    * @param  array  $parameters
    * @return string
    */
-  protected function replaceRouteParameters($route, &$parameters = [])
+  protected function replaceRouteParameters($route, &$parameters = []): ?string
   {
-    return preg_replace_callback('/\{(.*?)(:.*?)?(\{[0-9,]+\})?\}/', function ($m) use (&$parameters) {
+    return preg_replace_callback('/\{(.*?)(:.*?)?(\{[0-9,]+\})?\}/', function (array $m) use (&$parameters) {
       return isset($parameters[$m[1]]) ? Arr::pull($parameters, $m[1]) : $m[0];
     }, $route);
   }
@@ -326,7 +319,7 @@ class UrlGenerator
    * @param  string  $root
    * @return string
    */
-  protected function getRootUrl($scheme, $root = null)
+  protected function getRootUrl($scheme, $root = null): ?string
   {
     if (is_null($root)) {
       if (is_null($this->cachedRoot)) {
@@ -338,16 +331,15 @@ class UrlGenerator
 
     $start = Str::startsWith($root, 'http://') ? 'http://' : 'https://';
 
-    return preg_replace('~'.$start.'~', $scheme, $root, 1);
+    return preg_replace('~'.$start.'~', $scheme, (string) $root, 1);
   }
 
   /**
    * Set the forced root URL.
    *
    * @param  string  $root
-   * @return void
    */
-  public function forceRootUrl($root)
+  public function forceRootUrl($root): void
   {
     $this->forcedRoot = rtrim($root, '/');
 
@@ -356,13 +348,8 @@ class UrlGenerator
 
   /**
    * Format the given URL segments into a single URL.
-   *
-   * @param  string  $root
-   * @param  string  $path
-   * @param  string  $tail
-   * @return string
    */
-  protected function trimUrl($root, $path, $tail = '')
+  protected function trimUrl(string $root, string $path, string $tail = ''): string
   {
     return trim($root.'/'.trim($path.'/'.$tail, '/'), '/');
   }

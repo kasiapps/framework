@@ -1,88 +1,81 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Response;
 use Laravel\Lumen\Http\ResponseFactory;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
-class ResponseFactoryTest extends TestCase
-{
-  public function testMakeDefaultResponse()
-  {
-    $content = 'hello';
-    $responseFactory = new ResponseFactory;
-    $response = $responseFactory->make($content);
-    $this->assertInstanceOf(SymfonyResponse::class, $response);
-    $this->assertEquals($content, $response->getContent());
-    $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
-  }
+it('makes default response', function () {
+  $content = 'hello';
+  $responseFactory = new ResponseFactory;
+  $response = $responseFactory->make($content);
 
-  public function testJsonDefaultResponse()
-  {
-    $content = ['hello' => 'world'];
-    $responseFactory = new ResponseFactory;
-    $response = $responseFactory->json($content);
+  expect($response)->toBeInstanceOf(SymfonyResponse::class);
+  expect($response->getContent())->toBe($content);
+  expect($response->getStatusCode())->toBe(Response::HTTP_OK);
+});
 
-    $this->assertInstanceOf(SymfonyResponse::class, $response);
-    $this->assertEquals('{"hello":"world"}', $response->getContent());
-    $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
-  }
+it('creates json default response', function () {
+  $content = ['hello' => 'world'];
+  $responseFactory = new ResponseFactory;
+  $jsonResponse = $responseFactory->json($content);
 
-  public function testStreamDefaultResponse()
-  {
-    $responseFactory = new ResponseFactory;
-    $response = $responseFactory->stream(function () {
-      echo 'hello';
-    });
+  expect($jsonResponse)->toBeInstanceOf(SymfonyResponse::class);
+  expect($jsonResponse->getContent())->toBe('{"hello":"world"}');
+  expect($jsonResponse->getStatusCode())->toBe(Response::HTTP_OK);
+});
 
-    $this->assertInstanceOf(SymfonyResponse::class, $response);
-    $this->assertFalse($response->getContent());
-    $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
-  }
+it('creates stream default response', function () {
+  $responseFactory = new ResponseFactory;
+  $streamedResponse = $responseFactory->stream(function (): void {
+    echo 'hello';
+  });
 
-  public function testDownloadDefaultResponse()
-  {
-    $temp = tempnam(sys_get_temp_dir(), 'fixture');
-    $fh = fopen($temp, 'w+');
-    fwrite($fh, 'writing to tempfile');
-    fclose($fh);
+  expect($streamedResponse)->toBeInstanceOf(SymfonyResponse::class);
+  expect($streamedResponse->getContent())->toBeFalse();
+  expect($streamedResponse->getStatusCode())->toBe(Response::HTTP_OK);
+});
 
-    $responseFactory = new ResponseFactory;
-    $response = $responseFactory->download($temp);
+it('creates download default response', function () {
+  $temp = tempnam(sys_get_temp_dir(), 'fixture');
+  $fh = fopen($temp, 'w+');
+  fwrite($fh, 'writing to tempfile');
+  fclose($fh);
 
-    $this->assertInstanceOf(SymfonyResponse::class, $response);
-    $this->assertFalse($response->getContent());
-    $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+  $responseFactory = new ResponseFactory;
+  $binaryFileResponse = $responseFactory->download($temp);
 
-    unlink($temp);
-  }
+  expect($binaryFileResponse)->toBeInstanceOf(SymfonyResponse::class);
+  expect($binaryFileResponse->getContent())->toBeFalse();
+  expect($binaryFileResponse->getStatusCode())->toBe(Response::HTTP_OK);
 
-  public function testJsonResponseFromArrayableInterface()
-  {
-    // mock one Arrayable object
-    $content = $this->getMockBuilder(Arrayable::class)
-      ->onlyMethods(['toArray'])
-      ->getMock();
-    $content->expects($this->once())
-      ->method('toArray')
-      ->willReturn(['hello' => 'world']);
+  unlink($temp);
+});
 
-    $responseFactory = new ResponseFactory;
-    $response = $responseFactory->json($content);
+it('creates json response from arrayable interface', function () {
+  // mock one Arrayable object
+  $content = $this->getMockBuilder(Arrayable::class)
+    ->onlyMethods(['toArray'])
+    ->getMock();
+  $content->expects($this->once())
+    ->method('toArray')
+    ->willReturn(['hello' => 'world']);
 
-    $this->assertInstanceOf(SymfonyResponse::class, $response);
-    $this->assertEquals('{"hello":"world"}', $response->getContent());
-    $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
-  }
+  $responseFactory = new ResponseFactory;
+  $jsonResponse = $responseFactory->json($content);
 
-  public function testStreamDeferredCallback()
-  {
-    $responseFactory = new ResponseFactory;
-    $response = $responseFactory->stream(function () {
-      $this->fail();
-    });
+  expect($jsonResponse)->toBeInstanceOf(SymfonyResponse::class);
+  expect($jsonResponse->getContent())->toBe('{"hello":"world"}');
+  expect($jsonResponse->getStatusCode())->toBe(Response::HTTP_OK);
+});
 
-    $this->assertFalse($response->getContent());
-  }
-}
+it('handles stream deferred callback', function () {
+  $responseFactory = new ResponseFactory;
+  $streamedResponse = $responseFactory->stream(function (): void {
+    $this->fail();
+  });
+
+  expect($streamedResponse->getContent())->toBeFalse();
+});

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Laravel\Lumen\Concerns;
 
 use Closure;
@@ -23,6 +25,8 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
+
+use function FastRoute\simpleDispatcher;
 
 trait RoutesRequests
 {
@@ -50,7 +54,7 @@ trait RoutesRequests
   /**
    * The FastRoute dispatcher.
    *
-   * @var \FastRoute\Dispatcher
+   * @var Dispatcher
    */
   protected $dispatcher;
 
@@ -74,7 +78,6 @@ trait RoutesRequests
   /**
    * Define the route middleware for the application.
    *
-   * @param  array  $middleware
    * @return $this
    */
   public function routeMiddleware(array $middleware)
@@ -87,12 +90,11 @@ trait RoutesRequests
   /**
    * Dispatch request and return response.
    *
-   * @param  \Symfony\Component\HttpFoundation\Request  $request
    * @return \Illuminate\Http\Response
    */
-  public function handle(SymfonyRequest $request)
+  public function handle(SymfonyRequest $symfonyRequest)
   {
-    $response = $this->dispatch($request);
+    $response = $this->dispatch($symfonyRequest);
 
     if (count($this->middleware) > 0) {
       $this->callTerminableMiddleware($response);
@@ -105,9 +107,8 @@ trait RoutesRequests
    * Run the application and send the response.
    *
    * @param  \Symfony\Component\HttpFoundation\Request|null  $request
-   * @return void
    */
-  public function run($request = null)
+  public function run($request = null): void
   {
     $response = $this->dispatch($request);
 
@@ -184,9 +185,8 @@ trait RoutesRequests
    * Parse the incoming request and return the method and path info.
    *
    * @param  \Symfony\Component\HttpFoundation\Request|null  $request
-   * @return array
    */
-  protected function parseIncomingRequest($request)
+  protected function parseIncomingRequest($request): array
   {
     if (! $request) {
       $request = LumenRequest::capture();
@@ -200,11 +200,11 @@ trait RoutesRequests
   /**
    * Create a FastRoute dispatcher instance for the application.
    *
-   * @return \FastRoute\Dispatcher
+   * @return Dispatcher
    */
   protected function createDispatcher()
   {
-    return $this->dispatcher ?: \FastRoute\simpleDispatcher(function ($r) {
+    return $this->dispatcher ?: simpleDispatcher(function ($r): void {
       foreach ($this->router->getRoutes() as $route) {
         $r->addRoute($route['method'], $route['uri'], $route['action']);
       }
@@ -213,11 +213,8 @@ trait RoutesRequests
 
   /**
    * Set the FastRoute dispatcher instance.
-   *
-   * @param  \FastRoute\Dispatcher  $dispatcher
-   * @return void
    */
-  public function setDispatcher(Dispatcher $dispatcher)
+  public function setDispatcher(Dispatcher $dispatcher): void
   {
     $this->dispatcher = $dispatcher;
   }
@@ -225,10 +222,9 @@ trait RoutesRequests
   /**
    * Handle the response from the FastRoute dispatcher.
    *
-   * @param  array  $routeInfo
    * @return mixed
    */
-  protected function handleDispatcherResponse($routeInfo)
+  protected function handleDispatcherResponse(array $routeInfo)
   {
     switch ($routeInfo[0]) {
       case Dispatcher::NOT_FOUND:
@@ -238,21 +234,20 @@ trait RoutesRequests
       case Dispatcher::FOUND:
         return $this->handleFoundRoute($routeInfo);
     }
+
+    return null;
   }
 
   /**
    * Handle a route found by the dispatcher.
    *
-   * @param  array  $routeInfo
    * @return mixed
    */
-  protected function handleFoundRoute($routeInfo)
+  protected function handleFoundRoute(array $routeInfo)
   {
     $this->currentRoute = $routeInfo;
 
-    $this['request']->setRouteResolver(function () {
-      return $this->currentRoute;
-    });
+    $this['request']->setRouteResolver(fn (): array => $this->currentRoute);
 
     $action = $routeInfo[1];
 
@@ -260,9 +255,7 @@ trait RoutesRequests
     if (isset($action['middleware'])) {
       $middleware = $this->gatherMiddlewareClassNames($action['middleware']);
 
-      return $this->prepareResponse($this->sendThroughPipeline($middleware, function () {
-        return $this->callActionOnArrayBasedRoute($this['request']->route());
-      }));
+      return $this->prepareResponse($this->sendThroughPipeline($middleware, fn () => $this->callActionOnArrayBasedRoute($this['request']->route())));
     }
 
     return $this->prepareResponse(
@@ -273,10 +266,9 @@ trait RoutesRequests
   /**
    * Call the Closure or invokable on the array based route.
    *
-   * @param  array  $routeInfo
    * @return mixed
    */
-  protected function callActionOnArrayBasedRoute($routeInfo)
+  protected function callActionOnArrayBasedRoute(array $routeInfo)
   {
     $action = $routeInfo[1];
 
@@ -310,10 +302,9 @@ trait RoutesRequests
   /**
    * Call a controller based route.
    *
-   * @param  array  $routeInfo
    * @return mixed
    */
-  protected function callControllerAction($routeInfo)
+  protected function callControllerAction(array $routeInfo)
   {
     $uses = $routeInfo[1]['uses'];
 
@@ -321,7 +312,7 @@ trait RoutesRequests
       $uses .= '@__invoke';
     }
 
-    [$controller, $method] = explode('@', $uses);
+    [$controller, $method] = explode('@', (string) $uses);
 
     if (! method_exists($instance = $this->make($controller), $method)) {
       throw new NotFoundHttpException;
@@ -329,11 +320,11 @@ trait RoutesRequests
 
     if ($instance instanceof LumenController) {
       return $this->callLumenController($instance, $method, $routeInfo);
-    } else {
-      return $this->callControllerCallable(
-        [$instance, $method], $routeInfo[2]
-      );
     }
+
+    return $this->callControllerCallable(
+      [$instance, $method], $routeInfo[2]
+    );
   }
 
   /**
@@ -341,10 +332,9 @@ trait RoutesRequests
    *
    * @param  mixed  $instance
    * @param  string  $method
-   * @param  array  $routeInfo
    * @return mixed
    */
-  protected function callLumenController($instance, $method, $routeInfo)
+  protected function callLumenController($instance, $method, array $routeInfo)
   {
     $middleware = $instance->getMiddlewareForMethod($method);
 
@@ -352,11 +342,11 @@ trait RoutesRequests
       return $this->callLumenControllerWithMiddleware(
         $instance, $method, $routeInfo, $middleware
       );
-    } else {
-      return $this->callControllerCallable(
-        [$instance, $method], $routeInfo[2]
-      );
     }
+
+    return $this->callControllerCallable(
+      [$instance, $method], $routeInfo[2]
+    );
   }
 
   /**
@@ -372,16 +362,12 @@ trait RoutesRequests
   {
     $middleware = $this->gatherMiddlewareClassNames($middleware);
 
-    return $this->sendThroughPipeline($middleware, function () use ($instance, $method, $routeInfo) {
-      return $this->callControllerCallable([$instance, $method], $routeInfo[2]);
-    });
+    return $this->sendThroughPipeline($middleware, fn () => $this->callControllerCallable([$instance, $method], $routeInfo[2]));
   }
 
   /**
    * Call a controller callable and return the response.
    *
-   * @param  callable  $callable
-   * @param  array  $parameters
    * @return \Illuminate\Http\Response
    */
   protected function callControllerCallable(callable $callable, array $parameters = [])
@@ -399,13 +385,12 @@ trait RoutesRequests
    * Gather the full class names for the middleware short-cut string.
    *
    * @param  string|array  $middleware
-   * @return array
    */
-  protected function gatherMiddlewareClassNames($middleware)
+  protected function gatherMiddlewareClassNames($middleware): array
   {
     $middleware = is_string($middleware) ? explode('|', $middleware) : (array) $middleware;
 
-    return array_map(function ($name) {
+    return array_map(function ($name): string {
       [$name, $parameters] = array_pad(explode(':', $name, 2), 2, null);
 
       return Arr::get($this->routeMiddleware, $name, $name).($parameters ? ':'.$parameters : '');
@@ -415,8 +400,6 @@ trait RoutesRequests
   /**
    * Send the request through the pipeline with the given callback.
    *
-   * @param  array  $middleware
-   * @param  \Closure  $then
    * @return mixed
    */
   protected function sendThroughPipeline(array $middleware, Closure $then)
@@ -458,10 +441,8 @@ trait RoutesRequests
 
   /**
    * Determines whether middleware should be skipped during request.
-   *
-   * @return bool
    */
-  protected function shouldSkipMiddleware()
+  protected function shouldSkipMiddleware(): bool
   {
     return $this->bound('middleware.disable') && $this->make('middleware.disable') === true;
   }

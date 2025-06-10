@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Laravel\Lumen\Auth;
 
 use Illuminate\Contracts\Auth\Access\Gate;
@@ -23,9 +25,8 @@ trait Authorizable
    *
    * @param  string  $ability
    * @param  array|mixed  $arguments
-   * @return bool
    */
-  public function cant($ability, $arguments = [])
+  public function cant($ability, $arguments = []): bool
   {
     return ! $this->can($ability, $arguments);
   }

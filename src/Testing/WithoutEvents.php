@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Laravel\Lumen\Testing;
 
 use Exception;
@@ -9,9 +11,9 @@ trait WithoutEvents
   /**
    * Prevent all event handles from being executed.
    *
-   * @throws \Exception
+   * @throws Exception
    */
-  public function disableEventsForAllTests()
+  public function disableEventsForAllTests(): void
   {
     if (method_exists($this, 'withoutEvents')) {
       $this->withoutEvents();

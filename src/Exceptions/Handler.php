@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Laravel\Lumen\Exceptions;
 
 use Exception;
@@ -11,12 +13,14 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Arr;
 use Illuminate\Validation\ValidationException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
@@ -35,53 +39,45 @@ class Handler implements ExceptionHandler
   /**
    * Report or log an exception.
    *
-   * @param  \Throwable  $e
-   * @return void
    *
-   * @throws \Exception
+   * @throws Exception
    */
-  public function report(Throwable $e)
+  public function report(Throwable $throwable): void
   {
-    if ($this->shouldntReport($e)) {
+    if ($this->shouldntReport($throwable)) {
       return;
     }
 
-    if (method_exists($e, 'report')) {
-      if ($e->report() !== false) {
-        return;
-      }
+    if (method_exists($throwable, 'report') && $throwable->report() !== false) {
+      return;
     }
 
     try {
       $logger = app(LoggerInterface::class);
-    } catch (Exception $ex) {
-      throw $e; // throw the original exception
+    } catch (Exception) {
+      throw $throwable; // throw the original exception
     }
 
-    $logger->error($e->getMessage(), ['exception' => $e]);
+    $logger->error($throwable->getMessage(), ['exception' => $throwable]);
   }
 
   /**
    * Determine if the exception should be reported.
    *
-   * @param  \Throwable  $e
    * @return bool
    */
-  public function shouldReport(Throwable $e)
+  public function shouldReport(Throwable $throwable)
   {
-    return ! $this->shouldntReport($e);
+    return ! $this->shouldntReport($throwable);
   }
 
   /**
    * Determine if the exception is in the "do not report" list.
-   *
-   * @param  \Throwable  $e
-   * @return bool
    */
-  protected function shouldntReport(Throwable $e)
+  protected function shouldntReport(Throwable $throwable): bool
   {
     foreach ($this->dontReport as $type) {
-      if ($e instanceof $type) {
+      if ($throwable instanceof $type) {
         return true;
       }
     }
@@ -92,89 +88,81 @@ class Handler implements ExceptionHandler
   /**
    * Render an exception into an HTTP response.
    *
-   * @param  \Illuminate\Http\Request  $request
-   * @param  \Throwable  $e
+   * @param  Request  $request
    * @return \Symfony\Component\HttpFoundation\Response
    *
-   * @throws \Throwable
+   * @throws Throwable
    */
-  public function render($request, Throwable $e)
+  public function render($request, Throwable $throwable)
   {
-    if (method_exists($e, 'render')) {
-      return $e->render($request);
-    } elseif ($e instanceof Responsable) {
-      return $e->toResponse($request);
+    if (method_exists($throwable, 'render')) {
+      return $throwable->render($request);
+    }
+    if ($throwable instanceof Responsable) {
+      return $throwable->toResponse($request);
+    }
+    if ($throwable instanceof HttpResponseException) {
+      return $throwable->getResponse();
     }
 
-    if ($e instanceof HttpResponseException) {
-      return $e->getResponse();
-    } elseif ($e instanceof ModelNotFoundException) {
-      $e = new NotFoundHttpException($e->getMessage(), $e);
-    } elseif ($e instanceof AuthorizationException) {
-      $e = new HttpException($e->status() ?? 403, $e->getMessage());
-    } elseif ($e instanceof ValidationException && $e->getResponse()) {
-      return $e->getResponse();
+    if ($throwable instanceof ModelNotFoundException) {
+      $throwable = new NotFoundHttpException($throwable->getMessage(), $throwable);
+    } elseif ($throwable instanceof AuthorizationException) {
+      $throwable = new HttpException($throwable->status() ?? 403, $throwable->getMessage());
+    } elseif ($throwable instanceof ValidationException && $throwable->getResponse()) {
+      return $throwable->getResponse();
     }
 
     return $request->expectsJson()
-                    ? $this->prepareJsonResponse($request, $e)
-                    : $this->prepareResponse($request, $e);
+                    ? $this->prepareJsonResponse($request, $throwable)
+                    : $this->prepareResponse($request, $throwable);
   }
 
   /**
    * Prepare a JSON response for the given exception.
    *
-   * @param  \Illuminate\Http\Request  $request
-   * @param  \Throwable  $e
-   * @return \Illuminate\Http\JsonResponse
+   * @param  Request  $request
    */
-  protected function prepareJsonResponse($request, Throwable $e)
+  protected function prepareJsonResponse($request, Throwable $throwable): JsonResponse
   {
     return new JsonResponse(
-      $this->convertExceptionToArray($e),
-      $this->isHttpException($e) ? $e->getStatusCode() : 500,
-      $this->isHttpException($e) ? $e->getHeaders() : [],
+      $this->convertExceptionToArray($throwable),
+      $this->isHttpException($throwable) ? $throwable->getStatusCode() : 500,
+      $this->isHttpException($throwable) ? $throwable->getHeaders() : [],
       JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
     );
   }
 
   /**
    * Convert the given exception to an array.
-   *
-   * @param  \Throwable  $e
-   * @return array
    */
-  protected function convertExceptionToArray(Throwable $e)
+  protected function convertExceptionToArray(Throwable $throwable): array
   {
     return config('app.debug', false) ? [
-      'message' => $e->getMessage(),
-      'exception' => get_class($e),
-      'file' => $e->getFile(),
-      'line' => $e->getLine(),
-      'trace' => collect($e->getTrace())->map(function ($trace) {
-        return Arr::except($trace, ['args']);
-      })->all(),
+      'message' => $throwable->getMessage(),
+      'exception' => $throwable::class,
+      'file' => $throwable->getFile(),
+      'line' => $throwable->getLine(),
+      'trace' => collect($throwable->getTrace())->map(fn ($trace) => Arr::except($trace, ['args']))->all(),
     ] : [
-      'message' => $this->isHttpException($e) ? $e->getMessage() : 'Server Error',
-        ];
+      'message' => $this->isHttpException($throwable) ? $throwable->getMessage() : 'Server Error',
+    ];
   }
 
   /**
    * Prepare a response for the given exception.
    *
-   * @param  \Illuminate\Http\Request  $request
-   * @param  \Throwable  $e
-   * @return \Illuminate\Http\Response
+   * @param  Request  $request
    */
-  protected function prepareResponse($request, Throwable $e)
+  protected function prepareResponse($request, Throwable $throwable): Response
   {
     $response = new Response(
-      $this->renderExceptionWithSymfony($e, config('app.debug', false)),
-      $this->isHttpException($e) ? $e->getStatusCode() : 500,
-      $this->isHttpException($e) ? $e->getHeaders() : []
+      $this->renderExceptionWithSymfony($throwable, config('app.debug', false)),
+      $this->isHttpException($throwable) ? $throwable->getStatusCode() : 500,
+      $this->isHttpException($throwable) ? $throwable->getHeaders() : []
     );
 
-    $response->exception = $e;
+    $response->exception = $throwable;
 
     return $response;
   }
@@ -182,34 +170,30 @@ class Handler implements ExceptionHandler
   /**
    * Render an exception to a string using Symfony.
    *
-   * @param  \Throwable  $e
    * @param  bool  $debug
-   * @return string
    */
-  protected function renderExceptionWithSymfony(Throwable $e, $debug)
+  protected function renderExceptionWithSymfony(Throwable $throwable, $debug): string
   {
-    $renderer = new HtmlErrorRenderer($debug);
+    $htmlErrorRenderer = new HtmlErrorRenderer($debug);
 
-    return $renderer->render($e)->getAsString();
+    return $htmlErrorRenderer->render($throwable)->getAsString();
   }
 
   /**
    * Render an exception to the console.
    *
-   * @param  \Symfony\Component\Console\Output\OutputInterface  $output
-   * @param  \Throwable  $e
-   * @return void
+   * @param  OutputInterface  $output
    */
-  public function renderForConsole($output, Throwable $e)
+  public function renderForConsole($output, Throwable $throwable): void
   {
-    if ($e instanceof CommandNotFoundException) {
-      $message = str($e->getMessage())->explode('.')->first();
+    if ($throwable instanceof CommandNotFoundException) {
+      $message = str($throwable->getMessage())->explode('.')->first();
 
-      if (! empty($alternatives = $e->getAlternatives())) {
+      if (! empty($alternatives = $throwable->getAlternatives())) {
         $message .= '. Did you mean one of these?';
 
         with(new Error($output))->render($message);
-        with(new BulletList($output))->render($e->getAlternatives());
+        with(new BulletList($output))->render($throwable->getAlternatives());
 
         $output->writeln('');
       } else {
@@ -219,17 +203,16 @@ class Handler implements ExceptionHandler
       return;
     }
 
-    (new ConsoleApplication)->renderThrowable($e, $output);
+    (new ConsoleApplication)->renderThrowable($throwable, $output);
   }
 
   /**
    * Determine if the given exception is an HTTP exception.
    *
-   * @param  \Throwable  $e
    * @return bool
    */
-  protected function isHttpException(Throwable $e)
+  protected function isHttpException(Throwable $throwable)
   {
-    return $e instanceof HttpExceptionInterface;
+    return $throwable instanceof HttpExceptionInterface;
   }
 }

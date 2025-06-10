@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Laravel\Lumen\Concerns;
 
 use ErrorException;
@@ -9,6 +11,7 @@ use Illuminate\Log\LogManager;
 use Laravel\Lumen\Exceptions\Handler;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\ErrorHandler\Error\FatalError;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
@@ -20,12 +23,10 @@ trait RegistersExceptionHandlers
    *
    * @param  int  $code
    * @param  string  $message
-   * @param  array  $headers
-   * @return void
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+   * @throws HttpException
    */
-  public function abort($code, $message = '', array $headers = [])
+  public function abort($code, $message = '', array $headers = []): void
   {
     if ($code == 404) {
       throw new NotFoundHttpException($message);
@@ -43,15 +44,15 @@ trait RegistersExceptionHandlers
   {
     error_reporting(-1);
 
-    set_error_handler(function ($level, $message, $file = '', $line = 0) {
+    set_error_handler(function ($level, $message, $file = '', $line = 0): void {
       $this->handleError($level, $message, $file, $line);
     });
 
-    set_exception_handler(function ($e) {
+    set_exception_handler(function ($e): void {
       $this->handleException($e);
     });
 
-    register_shutdown_function(function () {
+    register_shutdown_function(function (): void {
       $this->handleShutdown();
     });
   }
@@ -66,17 +67,19 @@ trait RegistersExceptionHandlers
    * @param  array  $context
    * @return void
    *
-   * @throws \ErrorException
+   * @throws ErrorException
    */
   public function handleError($level, $message, $file = '', $line = 0, $context = [])
   {
-    if (error_reporting() & $level) {
+    if ((error_reporting() & $level) !== 0) {
       if ($this->isDeprecation($level)) {
         return $this->handleDeprecation($message, $file, $line);
       }
 
       throw new ErrorException($message, 0, $level, $file, $line);
     }
+
+    return null;
   }
 
   /**
@@ -85,13 +88,12 @@ trait RegistersExceptionHandlers
    * @param  string  $message
    * @param  string  $file
    * @param  int  $line
-   * @return void
    */
-  public function handleDeprecation($message, $file, $line)
+  public function handleDeprecation($message, $file, $line): void
   {
     try {
       $logger = $this->make('log');
-    } catch (Exception $e) {
+    } catch (Exception) {
       return;
     }
 
@@ -101,7 +103,7 @@ trait RegistersExceptionHandlers
 
     $this->ensureDeprecationLoggerIsConfigured();
 
-    with($logger->channel('deprecations'), function ($log) use ($message, $file, $line) {
+    with($logger->channel('deprecations'), function ($log) use ($message, $file, $line): void {
       $log->warning(sprintf('%s in %s on line %s',
         $message, $file, $line
       ));
@@ -115,7 +117,7 @@ trait RegistersExceptionHandlers
    */
   protected function ensureDeprecationLoggerIsConfigured()
   {
-    with($this->make('config'), function ($config) {
+    with($this->make('config'), function ($config): void {
       if ($config->get('logging.channels.deprecations')) {
         return;
       }
@@ -128,10 +130,8 @@ trait RegistersExceptionHandlers
 
   /**
    * Handle the PHP shutdown event.
-   *
-   * @return void
    */
-  public function handleShutdown()
+  public function handleShutdown(): void
   {
     if (! is_null($error = error_get_last()) && $this->isFatal($error['type'])) {
       $this->handleException($this->fatalErrorFromPhpError($error, 0));
@@ -141,11 +141,9 @@ trait RegistersExceptionHandlers
   /**
    * Create a new fatal error instance from an error array.
    *
-   * @param  array  $error
    * @param  int|null  $traceOffset
-   * @return \Symfony\Component\ErrorHandler\Error\FatalError
    */
-  protected function fatalErrorFromPhpError(array $error, $traceOffset = null)
+  protected function fatalErrorFromPhpError(array $error, $traceOffset = null): FatalError
   {
     return new FatalError($error['message'], 0, $error, $traceOffset);
   }
@@ -154,9 +152,8 @@ trait RegistersExceptionHandlers
    * Determine if the error level is a deprecation.
    *
    * @param  int  $level
-   * @return bool
    */
-  protected function isDeprecation($level)
+  protected function isDeprecation($level): bool
   {
     return in_array($level, [E_DEPRECATED, E_USER_DEPRECATED]);
   }
@@ -165,9 +162,8 @@ trait RegistersExceptionHandlers
    * Determine if the error type is fatal.
    *
    * @param  int  $type
-   * @return bool
    */
-  protected function isFatal($type)
+  protected function isFatal($type): bool
   {
     return in_array($type, [E_COMPILE_ERROR, E_CORE_ERROR, E_ERROR, E_PARSE]);
   }
@@ -175,48 +171,46 @@ trait RegistersExceptionHandlers
   /**
    * Send the exception to the handler and return the response.
    *
-   * @param  \Throwable  $e
-   * @return \Symfony\Component\HttpFoundation\Response
+   * @return Response
    */
-  protected function sendExceptionToHandler(Throwable $e)
+  protected function sendExceptionToHandler(Throwable $throwable)
   {
     $handler = $this->resolveExceptionHandler();
 
-    $handler->report($e);
+    $handler->report($throwable);
 
-    return $handler->render($this->make('request'), $e);
+    return $handler->render($this->make('request'), $throwable);
   }
 
   /**
    * Handle an uncaught exception instance.
    *
-   * @param  \Throwable  $e
    * @return void
    */
-  protected function handleException(Throwable $e)
+  protected function handleException(Throwable $throwable)
   {
     $handler = $this->resolveExceptionHandler();
 
-    $handler->report($e);
+    $handler->report($throwable);
 
     if ($this->runningInConsole()) {
-      $handler->renderForConsole(new ConsoleOutput, $e);
+      $handler->renderForConsole(new ConsoleOutput, $throwable);
     } else {
-      $handler->render($this->make('request'), $e)->send();
+      $handler->render($this->make('request'), $throwable)->send();
     }
   }
 
   /**
    * Get the exception handler from the container.
    *
-   * @return \Illuminate\Contracts\Debug\ExceptionHandler
+   * @return ExceptionHandler
    */
   protected function resolveExceptionHandler()
   {
     if ($this->bound(ExceptionHandler::class)) {
       return $this->make(ExceptionHandler::class);
-    } else {
-      return $this->make(Handler::class);
     }
+
+    return $this->make(Handler::class);
   }
 }

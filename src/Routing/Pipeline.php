@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Laravel\Lumen\Routing;
 
 use Closure as BaseClosure;
@@ -22,23 +24,20 @@ class Pipeline extends BasePipeline
    */
   protected function carry()
   {
-    return function ($stack, $pipe) {
-      return function ($passable) use ($stack, $pipe) {
-        try {
-          $slice = parent::carry();
+    return fn ($stack, $pipe): BaseClosure => function ($passable) use ($stack, $pipe) {
+      try {
+        $slice = parent::carry();
 
-          return ($slice($stack, $pipe))($passable);
-        } catch (Throwable $e) {
-          return $this->handleException($passable, $e);
-        }
-      };
+        return ($slice($stack, $pipe))($passable);
+      } catch (Throwable $e) {
+        return $this->handleException($passable, $e);
+      }
     };
   }
 
   /**
    * Get the initial slice to begin the stack call.
    *
-   * @param  \Closure  $destination
    * @return \Closure
    */
   protected function prepareDestination(BaseClosure $destination)
@@ -56,19 +55,18 @@ class Pipeline extends BasePipeline
    * Handle the given exception.
    *
    * @param  mixed  $passable
-   * @param  \Throwable  $e
    * @return mixed
    */
-  protected function handleException($passable, Throwable $e)
+  protected function handleException($passable, Throwable $throwable)
   {
     if (! $this->container->bound(ExceptionHandler::class) || ! $passable instanceof Request) {
-      throw $e;
+      throw $throwable;
     }
 
-    $handler = $this->container->make(ExceptionHandler::class);
+    $exceptionHandler = $this->container->make(ExceptionHandler::class);
 
-    $handler->report($e);
+    $exceptionHandler->report($throwable);
 
-    return $handler->render($passable, $e);
+    return $exceptionHandler->render($passable, $throwable);
   }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Laravel\Lumen\Bus;
 
 use Illuminate\Container\Container;
@@ -10,22 +12,17 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 class PendingDispatch
 {
   /**
-   * The job.
-   *
-   * @var mixed
-   */
-  protected $job;
-
-  /**
    * Create a new pending job dispatch.
    *
    * @param  mixed  $job
    * @return void
    */
-  public function __construct($job)
-  {
-    $this->job = $job;
-  }
+  public function __construct(
+    /**
+     * The job.
+     */
+    protected $job
+  ) {}
 
   /**
    * Set the desired connection for the job.
@@ -33,7 +30,7 @@ class PendingDispatch
    * @param  string|null  $connection
    * @return $this
    */
-  public function onConnection($connection)
+  public function onConnection($connection): static
   {
     $this->job->onConnection($connection);
 
@@ -46,7 +43,7 @@ class PendingDispatch
    * @param  string|null  $queue
    * @return $this
    */
-  public function onQueue($queue)
+  public function onQueue($queue): static
   {
     $this->job->onQueue($queue);
 
@@ -73,7 +70,7 @@ class PendingDispatch
                 : Container::getInstance()->make(Cache::class);
 
     return (bool) $cache->lock(
-      $key = 'laravel_unique_job:'.get_class($this->job).$uniqueId,
+      $key = 'laravel_unique_job:'.$this->job::class.$uniqueId,
       $this->job->uniqueFor ?? 0
     )->get();
   }
@@ -87,8 +84,7 @@ class PendingDispatch
   {
     if (! $this->shouldDispatch()) {
       return;
-    } else {
-      app(Dispatcher::class)->dispatch($this->job);
     }
+    app(Dispatcher::class)->dispatch($this->job);
   }
 }

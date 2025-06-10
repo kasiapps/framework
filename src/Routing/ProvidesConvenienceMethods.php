@@ -1,10 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Laravel\Lumen\Routing;
 
 use Closure as BaseClosure;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\Access\Response;
 use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Contracts\Validation\Factory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -29,22 +35,16 @@ trait ProvidesConvenienceMethods
 
   /**
    * Set the response builder callback.
-   *
-   * @param  \Closure  $callback
-   * @return void
    */
-  public static function buildResponseUsing(BaseClosure $callback)
+  public static function buildResponseUsing(BaseClosure $callback): void
   {
     static::$responseBuilder = $callback;
   }
 
   /**
    * Set the error formatter callback.
-   *
-   * @param  \Closure  $callback
-   * @return void
    */
-  public static function formatErrorsUsing(BaseClosure $callback)
+  public static function formatErrorsUsing(BaseClosure $callback): void
   {
     static::$errorFormatter = $callback;
   }
@@ -52,13 +52,9 @@ trait ProvidesConvenienceMethods
   /**
    * Validate the given request with the given rules.
    *
-   * @param  \Illuminate\Http\Request  $request
-   * @param  array  $rules
-   * @param  array  $messages
-   * @param  array  $customAttributes
    * @return array
    *
-   * @throws \Illuminate\Validation\ValidationException
+   * @throws ValidationException
    */
   public function validate(Request $request, array $rules, array $messages = [], array $customAttributes = [])
   {
@@ -74,27 +70,21 @@ trait ProvidesConvenienceMethods
   /**
    * Get the request input based on the given validation rules.
    *
-   * @param  \Illuminate\Http\Request  $request
-   * @param  array  $rules
    * @return array
    */
   protected function extractInputFromRules(Request $request, array $rules)
   {
-    return $request->only(collect($rules)->keys()->map(function ($rule) {
-      return Str::contains($rule, '.') ? explode('.', $rule)[0] : $rule;
-    })->unique()->toArray());
+    return $request->only(collect($rules)->keys()->map(fn ($rule) => Str::contains($rule, '.') ? explode('.', (string) $rule)[0] : $rule)->unique()->toArray());
   }
 
   /**
    * Throw the failed validation exception.
    *
-   * @param  \Illuminate\Http\Request  $request
    * @param  \Illuminate\Contracts\Validation\Validator  $validator
-   * @return void
    *
-   * @throws \Illuminate\Validation\ValidationException
+   * @throws ValidationException
    */
-  protected function throwValidationException(Request $request, $validator)
+  protected function throwValidationException(Request $request, $validator): never
   {
     throw new ValidationException($validator, $this->buildFailedValidationResponse(
       $request, $this->formatValidationErrors($validator)
@@ -104,9 +94,7 @@ trait ProvidesConvenienceMethods
   /**
    * Build a response based on the given errors.
    *
-   * @param  \Illuminate\Http\Request  $request
-   * @param  array  $errors
-   * @return \Illuminate\Http\JsonResponse|mixed
+   * @return JsonResponse|mixed
    */
   protected function buildFailedValidationResponse(Request $request, array $errors)
   {
@@ -120,7 +108,6 @@ trait ProvidesConvenienceMethods
   /**
    * Format validation errors.
    *
-   * @param  \Illuminate\Validation\Validator  $validator
    * @return array|mixed
    */
   protected function formatValidationErrors(Validator $validator)
@@ -137,9 +124,9 @@ trait ProvidesConvenienceMethods
    *
    * @param  mixed  $ability
    * @param  mixed|array  $arguments
-   * @return \Illuminate\Auth\Access\Response
+   * @return Response
    *
-   * @throws \Illuminate\Auth\Access\AuthorizationException
+   * @throws AuthorizationException
    */
   public function authorize($ability, $arguments = [])
   {
@@ -151,12 +138,12 @@ trait ProvidesConvenienceMethods
   /**
    * Authorize a given action for a user.
    *
-   * @param  \Illuminate\Contracts\Auth\Authenticatable|mixed  $user
+   * @param  Authenticatable|mixed  $user
    * @param  mixed  $ability
    * @param  mixed|array  $arguments
-   * @return \Illuminate\Auth\Access\Response
+   * @return Response
    *
-   * @throws \Illuminate\Auth\Access\AuthorizationException
+   * @throws AuthorizationException
    */
   public function authorizeForUser($user, $ability, $arguments = [])
   {
@@ -170,9 +157,8 @@ trait ProvidesConvenienceMethods
    *
    * @param  mixed  $ability
    * @param  mixed|array  $arguments
-   * @return array
    */
-  protected function parseAbilityAndArguments($ability, $arguments)
+  protected function parseAbilityAndArguments($ability, $arguments): array
   {
     if (is_string($ability)) {
       return [$ability, $arguments];
@@ -207,7 +193,7 @@ trait ProvidesConvenienceMethods
   /**
    * Get a validation factory instance.
    *
-   * @return \Illuminate\Contracts\Validation\Factory
+   * @return Factory
    */
   protected function getValidationFactory()
   {

@@ -1,11 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
+use Illuminate\Broadcasting\PendingBroadcast;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
+use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastFactory;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Contracts\Translation\Translator;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\View\View;
+use Laravel\Lumen\Application;
 use Laravel\Lumen\Bus\PendingDispatch;
+use Laravel\Lumen\Http\Redirector;
+use Laravel\Lumen\Http\ResponseFactory;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 if (! function_exists('abort')) {
   /**
@@ -13,13 +30,11 @@ if (! function_exists('abort')) {
    *
    * @param  int  $code
    * @param  string  $message
-   * @param  array  $headers
-   * @return void
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+   * @throws HttpException
+   * @throws NotFoundHttpException
    */
-  function abort($code, $message = '', array $headers = [])
+  function abort($code, $message = '', array $headers = []): void
   {
     app()->abort($code, $message, $headers);
   }
@@ -30,8 +45,7 @@ if (! function_exists('app')) {
    * Get the available container instance.
    *
    * @param  string|null  $make
-   * @param  array  $parameters
-   * @return mixed|\Laravel\Lumen\Application
+   * @return mixed|Application
    */
   function app($make = null, array $parameters = [])
   {
@@ -48,7 +62,7 @@ if (! function_exists('auth')) {
    * Get the available auth instance.
    *
    * @param  string|null  $guard
-   * @return \Illuminate\Contracts\Auth\Factory|\Illuminate\Contracts\Auth\Guard|\Illuminate\Contracts\Auth\StatefulGuard
+   * @return \Illuminate\Contracts\Auth\Factory|Guard|StatefulGuard
    */
   function auth($guard = null)
   {
@@ -65,9 +79,8 @@ if (! function_exists('base_path')) {
    * Get the path to the base of the install.
    *
    * @param  string  $path
-   * @return string
    */
-  function base_path($path = '')
+  function base_path(?string $path = ''): string
   {
     return app()->basePath().($path ? '/'.$path : $path);
   }
@@ -78,7 +91,7 @@ if (! function_exists('broadcast')) {
    * Begin broadcasting an event.
    *
    * @param  mixed|null  $event
-   * @return \Illuminate\Broadcasting\PendingBroadcast
+   * @return PendingBroadcast
    */
   function broadcast($event = null)
   {
@@ -104,9 +117,8 @@ if (! function_exists('dispatch')) {
    * Dispatch a job to its appropriate handler.
    *
    * @param  mixed  $job
-   * @return mixed
    */
-  function dispatch($job)
+  function dispatch($job): PendingDispatch
   {
     return new PendingDispatch($job);
   }
@@ -201,7 +213,7 @@ if (! function_exists('info')) {
    */
   function info($message, $context = [])
   {
-    return app('Psr\Log\LoggerInterface')->info($message, $context);
+    return app(LoggerInterface::class)->info($message, $context);
   }
 }
 
@@ -213,11 +225,11 @@ if (! function_exists('redirect')) {
    * @param  int  $status
    * @param  array  $headers
    * @param  bool|null  $secure
-   * @return \Laravel\Lumen\Http\Redirector|\Illuminate\Http\RedirectResponse
+   * @return Redirector|RedirectResponse
    */
   function redirect($to = null, $status = 302, $headers = [], $secure = null)
   {
-    $redirector = new Laravel\Lumen\Http\Redirector(app());
+    $redirector = new Redirector(app());
 
     if (is_null($to)) {
       return $redirector;
@@ -230,13 +242,10 @@ if (! function_exists('redirect')) {
 if (! function_exists('report')) {
   /**
    * Report an exception.
-   *
-   * @param  \Throwable  $exception
-   * @return void
    */
-  function report(Throwable $exception)
+  function report(Throwable $throwable): void
   {
-    app(ExceptionHandler::class)->report($exception);
+    app(ExceptionHandler::class)->report($throwable);
   }
 }
 
@@ -246,7 +255,7 @@ if (! function_exists('request')) {
    *
    * @param  array|string|null  $key
    * @param  mixed  $default
-   * @return \Illuminate\Http\Request|string|array
+   * @return Request|string|array
    */
   function request($key = null, $default = null)
   {
@@ -283,12 +292,11 @@ if (! function_exists('response')) {
    *
    * @param  string  $content
    * @param  int  $status
-   * @param  array  $headers
-   * @return \Illuminate\Http\Response|\Laravel\Lumen\Http\ResponseFactory
+   * @return Response|ResponseFactory
    */
   function response($content = '', $status = 200, array $headers = [])
   {
-    $factory = new Laravel\Lumen\Http\ResponseFactory;
+    $factory = new ResponseFactory;
 
     if (func_num_args() === 0) {
       return $factory;
@@ -333,7 +341,7 @@ if (! function_exists('trans')) {
    * @param  string|null  $id
    * @param  array  $replace
    * @param  string|null  $locale
-   * @return \Illuminate\Contracts\Translation\Translator|string|array|null
+   * @return Translator|string|array|null
    */
   function trans($id = null, $replace = [], $locale = null)
   {
@@ -365,8 +373,7 @@ if (! function_exists('trans_choice')) {
    * Translates the given message based on a count.
    *
    * @param  string  $id
-   * @param  int|array|\Countable  $number
-   * @param  array  $replace
+   * @param  int|array|Countable  $number
    * @param  string|null  $locale
    * @return string
    */
@@ -395,11 +402,7 @@ if (! function_exists('validator')) {
   /**
    * Create a new Validator instance.
    *
-   * @param  array  $data
-   * @param  array  $rules
-   * @param  array  $messages
-   * @param  array  $customAttributes
-   * @return \Illuminate\Contracts\Validation\Validator
+   * @return Validator
    */
   function validator(array $data = [], array $rules = [], array $messages = [], array $customAttributes = [])
   {
@@ -420,7 +423,7 @@ if (! function_exists('view')) {
    * @param  string  $view
    * @param  array  $data
    * @param  array  $mergeData
-   * @return \Illuminate\View\View
+   * @return View
    */
   function view($view = null, $data = [], $mergeData = [])
   {

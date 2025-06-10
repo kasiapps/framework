@@ -1,6 +1,7 @@
 # Kasi Framework
 
 [![Build Status](https://github.com/kasiapps/framework/workflows/tests/badge.svg)](https://github.com/kasiapps/framework/actions)
+[![Coverage](https://img.shields.io/badge/coverage-51.4%25-yellow)](https://github.com/kasiapps/framework/blob/main/clover.xml)
 [![Total Downloads](https://img.shields.io/packagist/dt/kasiapps/framework)](https://packagist.org/packages/kasiapps/framework)
 [![Latest Stable Version](https://img.shields.io/packagist/v/kasiapps/framework)](https://packagist.org/packages/kasiapps/framework)
 [![License](https://img.shields.io/packagist/l/kasiapps/framework)](https://packagist.org/packages/kasiapps/framework)

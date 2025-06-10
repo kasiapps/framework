@@ -1,168 +1,185 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
 use Illuminate\Log\LogManager;
 use Laravel\Lumen\Concerns\RegistersExceptionHandlers;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Monolog\Handler\NullHandler;
 
-class HandleExceptionsTest extends TestCase
+beforeEach(function () {
+  $this->container = new Container;
+  $this->config = new Config;
+  $this->container->singleton('config', fn (): Config => $this->config);
+
+  // Set error reporting to include deprecations
+  error_reporting(E_ALL);
+});
+
+afterEach(function () {
+  $this->container::setInstance(null);
+  m::close();
+});
+
+// Helper function to access the trait methods
+function getTestInstance($container, $config)
 {
-  use RegistersExceptionHandlers;
-
-  protected $container;
-
-  protected $config;
-
-  protected function setUp(): void
+  return new class($container, $config)
   {
-    $this->container = new Container;
+    use RegistersExceptionHandlers;
 
-    $this->config = new Config;
+    public $container;
 
-    $this->container->singleton('config', function () {
-      return $this->config;
-    });
-  }
+    public $config;
 
-  protected function tearDown(): void
-  {
-    $this->container::setInstance(null);
+    public function __construct($container, $config)
+    {
+      $this->container = $container;
+      $this->config = $config;
+    }
 
-    m::close();
-  }
+    protected function make($abstract, array $parameters = [])
+    {
+      return $this->container->make($abstract, $parameters);
+    }
 
-  public function testPhpDeprecations()
-  {
-    $logger = m::mock(LogManager::class);
-    $this->container->instance('log', $logger);
-    $logger->shouldReceive('channel')->with('deprecations')->andReturnSelf();
-    $logger->shouldReceive('warning')->with(sprintf('%s in %s on line %s',
-      'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated',
-      '/home/user/laravel/routes/web.php',
-      17
-    ));
+    protected function bound($abstract)
+    {
+      return $this->container->bound($abstract);
+    }
 
-    $this->handleError(
-      E_DEPRECATED,
-      'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated',
-      '/home/user/laravel/routes/web.php',
-      17
-    );
-  }
-
-  public function testUserDeprecations()
-  {
-    $logger = m::mock(LogManager::class);
-    $this->container->instance('log', $logger);
-    $logger->shouldReceive('channel')->with('deprecations')->andReturnSelf();
-    $logger->shouldReceive('warning')->with(sprintf('%s in %s on line %s',
-      'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated',
-      '/home/user/laravel/routes/web.php',
-      17
-    ));
-
-    $this->handleError(
-      E_USER_DEPRECATED,
-      'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated',
-      '/home/user/laravel/routes/web.php',
-      17
-    );
-  }
-
-  public function testErrors()
-  {
-    $logger = m::mock(LogManager::class);
-    $this->container->instance('log', $logger);
-    $logger->shouldNotReceive('channel');
-    $logger->shouldNotReceive('warning');
-
-    $this->expectException(ErrorException::class);
-    $this->expectExceptionMessage('Something went wrong');
-
-    $this->handleError(
-      E_ERROR,
-      'Something went wrong',
-      '/home/user/laravel/src/Providers/AppServiceProvider.php',
-      17
-    );
-  }
-
-  public function testEnsuresDeprecationsDriver()
-  {
-    $logger = m::mock(LogManager::class);
-    $this->container->instance('log', $logger);
-    $logger->shouldReceive('channel')->andReturnSelf();
-    $logger->shouldReceive('warning');
-
-    $this->config->set('logging.channels.stack', [
-      'driver' => 'stack',
-      'channels' => ['single'],
-      'ignore_exceptions' => false,
-    ]);
-    $this->config->set('logging.deprecations', 'stack');
-
-    $this->handleError(
-      E_USER_DEPRECATED,
-      'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated',
-      '/home/user/laravel/routes/web.php',
-      17
-    );
-
-    $this->assertEquals(
-      [
-        'driver' => 'stack',
-        'channels' => ['single'],
-        'ignore_exceptions' => false,
-      ],
-      $this->config->get('logging.channels.deprecations')
-    );
-  }
-
-  public function testEnsuresNullDeprecationsDriver()
-  {
-    $logger = m::mock(LogManager::class);
-    $this->container->instance('log', $logger);
-    $logger->shouldReceive('channel')->andReturnSelf();
-    $logger->shouldReceive('warning');
-
-    $this->config->set('logging.channels.null', [
-      'driver' => 'monolog',
-      'handler' => NullHandler::class,
-    ]);
-
-    $this->handleError(
-      E_USER_DEPRECATED,
-      'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated',
-      '/home/user/laravel/routes/web.php',
-      17
-    );
-
-    $this->assertEquals(
-      NullHandler::class,
-      $this->config->get('logging.channels.deprecations.handler')
-    );
-  }
-
-  public function testNoDeprecationsDriverIfNoDeprecationsHereSend()
-  {
-    $this->assertEquals(null, $this->config->get('logging.deprecations'));
-    $this->assertEquals(null, $this->config->get('logging.channels.deprecations'));
-  }
-
-  public function testIgnoreDeprecationIfLoggerUnresolvable()
-  {
-    $this->handleError(
-      E_DEPRECATED,
-      'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated',
-      '/home/user/laravel/routes/web.php',
-      17
-    );
-  }
-
-  protected function make($abstract, array $parameters = [])
-  {
-    return $this->container->make($abstract, $parameters);
-  }
+    protected function runningInConsole()
+    {
+      return false; // For testing purposes
+    }
+  };
 }
+
+it('handles PHP deprecations', function () {
+  $testInstance = getTestInstance($this->container, $this->config);
+
+  $mock = m::mock(LogManager::class);
+  $this->container->instance('log', $mock);
+  $mock->shouldReceive('channel')->with('deprecations')->andReturnSelf();
+  $mock->shouldReceive('warning')->with(sprintf('%s in %s on line %s',
+    'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated',
+    '/home/user/laravel/routes/web.php',
+    17
+  ));
+
+  $testInstance->handleError(
+    E_DEPRECATED,
+    'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated',
+    '/home/user/laravel/routes/web.php',
+    17
+  );
+});
+
+it('handles user deprecations', function () {
+  $testInstance = getTestInstance($this->container, $this->config);
+
+  $mock = m::mock(LogManager::class);
+  $this->container->instance('log', $mock);
+  $mock->shouldReceive('channel')->with('deprecations')->andReturnSelf();
+  $mock->shouldReceive('warning')->with(sprintf('%s in %s on line %s',
+    'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated',
+    '/home/user/laravel/routes/web.php',
+    17
+  ));
+
+  $testInstance->handleError(
+    E_USER_DEPRECATED,
+    'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated',
+    '/home/user/laravel/routes/web.php',
+    17
+  );
+});
+
+it('handles errors', function () {
+  $testInstance = getTestInstance($this->container, $this->config);
+
+  $mock = m::mock(LogManager::class);
+  $this->container->instance('log', $mock);
+  $mock->shouldNotReceive('channel');
+  $mock->shouldNotReceive('warning');
+
+  expect(fn () => $testInstance->handleError(
+    E_ERROR,
+    'Something went wrong',
+    '/home/user/laravel/src/Providers/AppServiceProvider.php',
+    17
+  ))->toThrow(ErrorException::class, 'Something went wrong');
+});
+
+it('ensures deprecations driver', function () {
+  $testInstance = getTestInstance($this->container, $this->config);
+
+  $mock = m::mock(LogManager::class);
+  $this->container->instance('log', $mock);
+  $mock->shouldReceive('channel')->andReturnSelf();
+  $mock->shouldReceive('warning');
+
+  $this->config->set('logging.channels.stack', [
+    'driver' => 'stack',
+    'channels' => ['single'],
+    'ignore_exceptions' => false,
+  ]);
+  $this->config->set('logging.deprecations', 'stack');
+
+  $testInstance->handleError(
+    E_USER_DEPRECATED,
+    'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated',
+    '/home/user/laravel/routes/web.php',
+    17
+  );
+
+  expect($this->config->get('logging.channels.deprecations'))->toBe([
+    'driver' => 'stack',
+    'channels' => ['single'],
+    'ignore_exceptions' => false,
+  ]);
+});
+
+it('ensures null deprecations driver', function () {
+  $testInstance = getTestInstance($this->container, $this->config);
+
+  $mock = m::mock(LogManager::class);
+  $this->container->instance('log', $mock);
+  $mock->shouldReceive('channel')->andReturnSelf();
+  $mock->shouldReceive('warning');
+
+  $this->config->set('logging.channels.null', [
+    'driver' => 'monolog',
+    'handler' => NullHandler::class,
+  ]);
+
+  $testInstance->handleError(
+    E_USER_DEPRECATED,
+    'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated',
+    '/home/user/laravel/routes/web.php',
+    17
+  );
+
+  expect($this->config->get('logging.channels.deprecations.handler'))->toBe(NullHandler::class);
+});
+
+it('has no deprecations driver if no deprecations here send', function () {
+  expect($this->config->get('logging.deprecations'))->toBeNull();
+  expect($this->config->get('logging.channels.deprecations'))->toBeNull();
+});
+
+it('ignores deprecation if logger unresolvable', function () {
+  $testInstance = getTestInstance($this->container, $this->config);
+
+  $testInstance->handleError(
+    E_DEPRECATED,
+    'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated',
+    '/home/user/laravel/routes/web.php',
+    17
+  );
+
+  // This test just ensures no exception is thrown when logger is unresolvable
+  expect(true)->toBeTrue();
+});

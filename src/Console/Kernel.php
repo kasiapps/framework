@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Laravel\Lumen\Console;
 
 use Illuminate\Console\Application as Artisan;
@@ -17,22 +19,18 @@ use RuntimeException;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Throwable;
 
 class Kernel implements KernelContract
 {
   /**
-   * The application implementation.
-   *
-   * @var \Laravel\Lumen\Application
-   */
-  protected $app;
-
-  /**
    * The Symfony event dispatcher implementation.
    *
-   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface|null
+   * @var EventDispatcherInterface|null
    */
   protected $symfonyDispatcher;
 
@@ -60,13 +58,13 @@ class Kernel implements KernelContract
   /**
    * Create a new console kernel instance.
    *
-   * @param  \Laravel\Lumen\Application  $app
    * @return void
    */
-  public function __construct(Application $app)
+  public function __construct(/**
+   * The application implementation.
+   */
+    protected \Laravel\Lumen\Application $app)
   {
-    $this->app = $app;
-
     if ($this->app->runningInConsole()) {
       $this->setRequestForConsole($this->app);
     } else {
@@ -80,14 +78,14 @@ class Kernel implements KernelContract
   /**
    * Set the request instance for URL generation.
    *
-   * @param  \Illuminate\Contracts\Foundation\Application  $app
+   * @param  \Illuminate\Contracts\Foundation\Application  $application
    * @return void
    */
-  protected function setRequestForConsole(Application $app)
+  protected function setRequestForConsole(Application $application)
   {
-    $uri = $app->make('config')->get('app.url', 'http://localhost');
+    $uri = $application->make('config')->get('app.url', 'http://localhost');
 
-    $components = parse_url($uri);
+    $components = parse_url((string) $uri);
 
     $server = $_SERVER;
 
@@ -98,7 +96,7 @@ class Kernel implements KernelContract
       ]);
     }
 
-    $app->instance('request', Request::create(
+    $application->instance('request', Request::create(
       $uri, 'GET', [], [], [], $server
     ));
   }
@@ -110,20 +108,20 @@ class Kernel implements KernelContract
    *
    * @return $this
    */
-  public function rerouteSymfonyCommandEvents()
+  public function rerouteSymfonyCommandEvents(): static
   {
     if (is_null($this->symfonyDispatcher)) {
       $this->symfonyDispatcher = new EventDispatcher;
 
-      $this->symfonyDispatcher->addListener(ConsoleEvents::COMMAND, function (ConsoleCommandEvent $event) {
+      $this->symfonyDispatcher->addListener(ConsoleEvents::COMMAND, function (ConsoleCommandEvent $consoleCommandEvent): void {
         $this->app[Dispatcher::class]->dispatch(
-          new CommandStarting($event->getCommand()->getName(), $event->getInput(), $event->getOutput())
+          new CommandStarting($consoleCommandEvent->getCommand()->getName(), $consoleCommandEvent->getInput(), $consoleCommandEvent->getOutput())
         );
       });
 
-      $this->symfonyDispatcher->addListener(ConsoleEvents::TERMINATE, function (ConsoleTerminateEvent $event) {
+      $this->symfonyDispatcher->addListener(ConsoleEvents::TERMINATE, function (ConsoleTerminateEvent $consoleTerminateEvent): void {
         $this->app[Dispatcher::class]->dispatch(
-          new CommandFinished($event->getCommand()->getName(), $event->getInput(), $event->getOutput(), $event->getExitCode())
+          new CommandFinished($consoleTerminateEvent->getCommand()->getName(), $consoleTerminateEvent->getInput(), $consoleTerminateEvent->getOutput(), $consoleTerminateEvent->getExitCode())
         );
       });
     }
@@ -148,8 +146,8 @@ class Kernel implements KernelContract
   /**
    * Run the console application.
    *
-   * @param  \Symfony\Component\Console\Input\InputInterface  $input
-   * @param  \Symfony\Component\Console\Output\OutputInterface  $output
+   * @param  InputInterface  $input
+   * @param  OutputInterface  $output
    * @return int
    */
   public function handle($input, $output = null)
@@ -173,10 +171,8 @@ class Kernel implements KernelContract
 
   /**
    * Bootstrap the application for artisan commands.
-   *
-   * @return void
    */
-  public function bootstrap()
+  public function bootstrap(): void
   {
     //
   }
@@ -184,11 +180,10 @@ class Kernel implements KernelContract
   /**
    * Terminate the application.
    *
-   * @param  \Symfony\Component\Console\Input\InputInterface  $input
+   * @param  InputInterface  $input
    * @param  int  $status
-   * @return void
    */
-  public function terminate($input, $status)
+  public function terminate($input, $status): void
   {
     $this->app->terminate();
   }
@@ -196,7 +191,6 @@ class Kernel implements KernelContract
   /**
    * Define the application's command schedule.
    *
-   * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
    * @return void
    */
   protected function schedule(Schedule $schedule)
@@ -208,7 +202,6 @@ class Kernel implements KernelContract
    * Run an Artisan console command by name.
    *
    * @param  string  $command
-   * @param  array  $parameters
    * @return int
    */
   public function call($command, array $parameters = [], $outputBuffer = null)
@@ -220,7 +213,6 @@ class Kernel implements KernelContract
    * Queue the given console command.
    *
    * @param  string  $command
-   * @param  array  $parameters
    * @return void
    */
   public function queue($command, array $parameters = [])
@@ -271,10 +263,8 @@ class Kernel implements KernelContract
 
   /**
    * Get the commands to add to the application.
-   *
-   * @return array
    */
-  protected function getCommands()
+  protected function getCommands(): array
   {
     return array_merge($this->commands, [
       ScheduleRunCommand::class,
@@ -284,37 +274,35 @@ class Kernel implements KernelContract
   /**
    * Report the exception to the exception handler.
    *
-   * @param  \Throwable  $e
    * @return void
    */
-  protected function reportException(Throwable $e)
+  protected function reportException(Throwable $throwable)
   {
-    $this->resolveExceptionHandler()->report($e);
+    $this->resolveExceptionHandler()->report($throwable);
   }
 
   /**
    * Report the exception to the exception handler.
    *
-   * @param  \Symfony\Component\Console\Output\OutputInterface  $output
-   * @param  \Throwable  $e
+   * @param  OutputInterface  $output
    * @return void
    */
-  protected function renderException($output, Throwable $e)
+  protected function renderException($output, Throwable $throwable)
   {
-    $this->resolveExceptionHandler()->renderForConsole($output, $e);
+    $this->resolveExceptionHandler()->renderForConsole($output, $throwable);
   }
 
   /**
    * Get the exception handler from the container.
    *
-   * @return \Illuminate\Contracts\Debug\ExceptionHandler
+   * @return ExceptionHandler
    */
   protected function resolveExceptionHandler()
   {
     if ($this->app->bound(ExceptionHandler::class)) {
       return $this->app->make(ExceptionHandler::class);
-    } else {
-      return $this->app->make(Handler::class);
     }
+
+    return $this->app->make(Handler::class);
   }
 }

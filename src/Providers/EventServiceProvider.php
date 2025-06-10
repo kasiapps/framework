@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Laravel\Lumen\Providers;
 
 use Illuminate\Support\ServiceProvider;
@@ -23,17 +25,15 @@ class EventServiceProvider extends ServiceProvider
   /**
    * {@inheritdoc}
    */
-  public function register()
+  public function register(): void
   {
     //
   }
 
   /**
    * Register the application's event listeners.
-   *
-   * @return void
    */
-  public function boot()
+  public function boot(): void
   {
     $events = app('events');
 

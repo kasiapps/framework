@@ -1,23 +1,36 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Laravel\Lumen\Testing;
 
 use Exception;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\View\Component;
+use Laravel\Lumen\Application;
+use Laravel\Lumen\Testing\Concerns\MakesHttpRequests;
 use Mockery;
 use PHPUnit\Framework\TestCase as BaseTestCase;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 abstract class TestCase extends BaseTestCase
 {
-  use Concerns\MakesHttpRequests;
+  /**
+   * @var mixed[]
+   */
+  public $dispatchedJobs;
+
+  public $code;
+
+  use MakesHttpRequests;
 
   /**
    * The application instance.
    *
-   * @var \Laravel\Lumen\Application
+   * @var Application
    */
   protected $app;
 
@@ -40,7 +53,7 @@ abstract class TestCase extends BaseTestCase
    *
    * Needs to be implemented by subclasses.
    *
-   * @return \Symfony\Component\HttpKernel\HttpKernelInterface
+   * @return HttpKernelInterface
    */
   abstract public function createApplication();
 
@@ -64,8 +77,6 @@ abstract class TestCase extends BaseTestCase
 
   /**
    * Setup the test environment.
-   *
-   * @return void
    */
   protected function setUp(): void
   {
@@ -83,7 +94,7 @@ abstract class TestCase extends BaseTestCase
    */
   protected function setUpTraits()
   {
-    $uses = array_flip(class_uses_recursive(get_class($this)));
+    $uses = array_flip(class_uses_recursive(static::class));
 
     if (isset($uses[DatabaseMigrations::class])) {
       $this->runDatabaseMigrations();
@@ -104,8 +115,6 @@ abstract class TestCase extends BaseTestCase
 
   /**
    * Clean up the testing environment before the next test.
-   *
-   * @return void
    */
   protected function tearDown(): void
   {
@@ -118,8 +127,8 @@ abstract class TestCase extends BaseTestCase
     }
 
     if ($this->app) {
-      foreach ($this->beforeApplicationDestroyedCallbacks as $callback) {
-        $callback();
+      foreach ($this->beforeApplicationDestroyedCallbacks as $beforeApplicationDestroyedCallback) {
+        $beforeApplicationDestroyedCallback();
       }
 
       $this->app->flush();
@@ -135,7 +144,6 @@ abstract class TestCase extends BaseTestCase
    * Assert that a given where condition exists in the database.
    *
    * @param  string  $table
-   * @param  array  $data
    * @param  string|null  $onConnection
    * @return $this
    */
@@ -154,7 +162,6 @@ abstract class TestCase extends BaseTestCase
    * Assert that a given where condition does not exist in the database.
    *
    * @param  string  $table
-   * @param  array  $data
    * @param  string|null  $onConnection
    * @return $this
    */
@@ -167,7 +174,6 @@ abstract class TestCase extends BaseTestCase
    * Assert that a given where condition does not exist in the database.
    *
    * @param  string  $table
-   * @param  array  $data
    * @param  string|null  $onConnection
    * @return $this
    */
@@ -194,20 +200,20 @@ abstract class TestCase extends BaseTestCase
   {
     $events = is_array($events) ? $events : func_get_args();
 
-    $mock = Mockery::spy(\Illuminate\Contracts\Events\Dispatcher::class);
+    $mock = Mockery::spy(Dispatcher::class);
 
-    $mock->shouldReceive('dispatch')->andReturnUsing(function ($called) use (&$events) {
+    $mock->shouldReceive('dispatch')->andReturnUsing(function ($called) use (&$events): void {
       foreach ($events as $key => $event) {
         if ((is_string($called) && $called === $event) ||
             (is_string($called) && is_subclass_of($called, $event)) ||
-            (is_object($called) && $called instanceof $event)) {
+            ($called instanceof $event)) {
           unset($events[$key]);
         }
       }
     });
 
-    $this->beforeApplicationDestroyed(function () use (&$events) {
-      if ($events) {
+    $this->beforeApplicationDestroyed(function () use (&$events): void {
+      if ($events !== []) {
         throw new Exception(
           'The following events were not fired: ['.implode(', ', $events).']'
         );
@@ -226,7 +232,7 @@ abstract class TestCase extends BaseTestCase
    */
   protected function withoutEvents()
   {
-    $mock = Mockery::mock(\Illuminate\Contracts\Events\Dispatcher::class);
+    $mock = Mockery::mock(Dispatcher::class);
 
     $mock->shouldReceive('dispatch');
 
@@ -270,7 +276,7 @@ abstract class TestCase extends BaseTestCase
   {
     $mock = Mockery::mock('Illuminate\Bus\Dispatcher[dispatch]', [$this->app]);
 
-    $mock->shouldReceive('dispatch')->andReturnUsing(function ($dispatched) {
+    $mock->shouldReceive('dispatch')->andReturnUsing(function ($dispatched): void {
       $this->dispatchedJobs[] = $dispatched;
     });
 
@@ -284,13 +290,12 @@ abstract class TestCase extends BaseTestCase
   /**
    * Set the currently logged in user for the application.
    *
-   * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
    * @param  string|null  $driver
    * @return $this
    */
-  public function actingAs(Authenticatable $user, $driver = null)
+  public function actingAs(Authenticatable $authenticatable, $driver = null)
   {
-    $this->be($user, $driver);
+    $this->be($authenticatable, $driver);
 
     return $this;
   }
@@ -298,13 +303,11 @@ abstract class TestCase extends BaseTestCase
   /**
    * Set the currently logged in user for the application.
    *
-   * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
    * @param  string|null  $driver
-   * @return void
    */
-  public function be(Authenticatable $user, $driver = null)
+  public function be(Authenticatable $authenticatable, $driver = null): void
   {
-    $this->app['auth']->guard($driver)->setUser($user);
+    $this->app['auth']->guard($driver)->setUser($authenticatable);
   }
 
   /**
@@ -322,7 +325,6 @@ abstract class TestCase extends BaseTestCase
   /**
    * Register a callback to be run before the application is destroyed.
    *
-   * @param  callable  $callback
    * @return void
    */
   protected function beforeApplicationDestroyed(callable $callback)

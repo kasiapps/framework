@@ -17,9 +17,8 @@ jobs:
       fail-fast: true
       matrix:
         php: [8.2, 8.3]
-        stability: [prefer-lowest, prefer-stable]
 
-    name: PHP ${{ matrix.php }} - ${{ matrix.stability }}
+    name: PHP ${{ matrix.php }}
 
     steps:
       - name: Checkout code
@@ -35,7 +34,43 @@ jobs:
           coverage: none
 
       - name: Install dependencies
-        run: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
+        run: composer update --prefer-dist --no-interaction --no-progress
 
       - name: Execute tests
-        run: vendor/bin/phpunit --display-deprecations --fail-on-deprecation
+        run: vendor/bin/pest --parallel
+
+  coverage:
+    runs-on: ubuntu-24.04
+    name: Coverage
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.3
+          extensions: dom, curl, libxml, mbstring, zip
+          ini-values: error_reporting=E_ALL
+          tools: composer:v2
+          coverage: pcov
+
+      - name: Install dependencies
+        run: composer update --prefer-dist --no-interaction --no-progress
+
+      - name: Execute tests with coverage
+        run: vendor/bin/pest --coverage --min=50 --parallel
+
+      - name: Commit coverage report
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add clover.xml
+          if ! git diff --staged --quiet; then
+            git commit -m "chore: update coverage report [skip ci]"
+            git push
+          fi

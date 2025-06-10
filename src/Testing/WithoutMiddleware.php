@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Laravel\Lumen\Testing;
 
 use Exception;
@@ -9,9 +11,9 @@ trait WithoutMiddleware
   /**
    * Prevent all middleware from being executed for this test class.
    *
-   * @throws \Exception
+   * @throws Exception
    */
-  public function disableMiddlewareForAllTests()
+  public function disableMiddlewareForAllTests(): void
   {
     if (method_exists($this, 'withoutMiddleware')) {
       $this->withoutMiddleware();

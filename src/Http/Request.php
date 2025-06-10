@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Laravel\Lumen\Http;
 
 use Illuminate\Http\Request as BaseRequest;
@@ -53,7 +55,7 @@ class Request extends BaseRequest
    *
    * @return string
    *
-   * @throws \RuntimeException
+   * @throws RuntimeException
    */
   public function fingerprint()
   {
@@ -70,7 +72,6 @@ class Request extends BaseRequest
    * Determine if the given offset exists.
    *
    * @param  string  $offset
-   * @return bool
    */
   public function offsetExists($offset): bool
   {

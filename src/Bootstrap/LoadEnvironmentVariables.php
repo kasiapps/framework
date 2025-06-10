@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Laravel\Lumen\Bootstrap;
 
 use Dotenv\Dotenv;
@@ -10,40 +12,29 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 class LoadEnvironmentVariables
 {
   /**
-   * The directory containing the environment file.
-   *
-   * @var string
-   */
-  protected $filePath;
-
-  /**
-   * The name of the environment file.
-   *
-   * @var string|null
-   */
-  protected $fileName;
-
-  /**
    * Create a new loads environment variables instance.
    *
-   * @param  string  $path
-   * @param  string|null  $name
+   * @param  string  $filePath
+   * @param  string|null  $fileName
    * @return void
    */
-  public function __construct($path, $name = null)
-  {
-    $this->filePath = $path;
-    $this->fileName = $name;
-  }
+  public function __construct(
+    /**
+     * The directory containing the environment file.
+     */
+    protected $filePath,
+    /**
+     * The name of the environment file.
+     */
+    protected $fileName = null
+  ) {}
 
   /**
    * Setup the environment variables.
    *
    * If no environment file exists, we continue silently.
-   *
-   * @return void
    */
-  public function bootstrap()
+  public function bootstrap(): void
   {
     try {
       $this->createDotenv()->safeLoad();
