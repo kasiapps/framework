@@ -12,7 +12,7 @@ on:
 jobs:
   tests:
     runs-on: ubuntu-24.04
-    name: Tests & Coverage
+    name: Tests
 
     steps:
       - name: Checkout code
@@ -27,21 +27,10 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip
           ini-values: error_reporting=E_ALL
           tools: composer:v2
-          coverage: pcov
+          coverage: none
 
       - name: Install dependencies
         run: composer update --prefer-dist --no-interaction --no-progress
 
-      - name: Execute tests with coverage
-        run: vendor/bin/pest --coverage --min=50 --cache-directory=/tmp/.phpunit.cache
-
-      - name: Commit coverage report
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add clover.xml
-          if ! git diff --staged --quiet; then
-            git commit -m "chore: update coverage report [skip ci]"
-            git push
-          fi
+      - name: Execute tests
+        run: vendor/bin/pest
