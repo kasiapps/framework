@@ -33,7 +33,7 @@ jobs:
         run: composer update --prefer-dist --no-interaction --no-progress
 
       - name: Execute tests with coverage
-        run: vendor/bin/pest --coverage --min=50
+        run: vendor/bin/pest --coverage --min=50 --cache-directory=/tmp/.phpunit.cache
 
       - name: Commit coverage report
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
