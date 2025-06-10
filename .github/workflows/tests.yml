@@ -12,22 +12,18 @@ on:
 jobs:
   tests:
     runs-on: ubuntu-24.04
-
-    strategy:
-      fail-fast: true
-      matrix:
-        php: [8.2, 8.3]
-
-    name: PHP ${{ matrix.php }}
+    name: Tests & Coverage
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php }}
+          php-version: 8.3
           extensions: dom, curl, libxml, mbstring, zip
           ini-values: error_reporting=E_ALL
           tools: composer:v2
@@ -36,10 +32,16 @@ jobs:
       - name: Install dependencies
         run: composer update --prefer-dist --no-interaction --no-progress
 
-      - name: Execute tests
-        run: vendor/bin/pest --coverage --min=50
+      - name: Execute tests with coverage
+        run: |
+          mkdir -p .phpunit.cache
+          echo "Running Pest with coverage..."
+          vendor/bin/pest --coverage --parallel --min=50
+          echo "Coverage completed, checking for clover.xml..."
+          ls -la clover.xml || echo "clover.xml not found"
 
       - name: Commit coverage report
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1749549809">
-  <project timestamp="1749549809">
+<coverage generated="1749550345">
+  <project timestamp="1749550345">
     <package name="Laravel\Lumen">
       <file name="/Users/vince/WWW/kasi/framework/src/Application.php">
         <class name="Laravel\Lumen\Application" namespace="Laravel\Lumen">
@@ -407,7 +407,7 @@
     <package name="Laravel\Lumen\Concerns">
       <file name="/Users/vince/WWW/kasi/framework/src/Concerns/RegistersExceptionHandlers.php">
         <class name="Laravel\Lumen\Concerns\RegistersExceptionHandlers" namespace="Laravel\Lumen\Concerns">
-          <metrics complexity="22" methods="12" coveredmethods="4" conditionals="0" coveredconditionals="0" statements="51" coveredstatements="35" elements="63" coveredelements="39"/>
+          <metrics complexity="22" methods="12" coveredmethods="4" conditionals="0" coveredconditionals="0" statements="51" coveredstatements="34" elements="63" coveredelements="38"/>
         </class>
         <line num="29" type="method" name="abort" visibility="public" complexity="2" crap="6" count="0"/>
         <line num="31" type="stmt" count="0"/>
@@ -430,12 +430,12 @@
         <line num="76" type="stmt" count="5"/>
         <line num="79" type="stmt" count="1"/>
         <line num="82" type="stmt" count="1"/>
-        <line num="92" type="method" name="handleDeprecation" visibility="public" complexity="3" crap="3.01" count="5"/>
+        <line num="92" type="method" name="handleDeprecation" visibility="public" complexity="3" crap="3.05" count="5"/>
         <line num="95" type="stmt" count="5"/>
-        <line num="96" type="stmt" count="1"/>
-        <line num="97" type="stmt" count="1"/>
-        <line num="100" type="stmt" count="4"/>
-        <line num="101" type="stmt" count="0"/>
+        <line num="96" type="stmt" count="0"/>
+        <line num="97" type="stmt" count="0"/>
+        <line num="100" type="stmt" count="5"/>
+        <line num="101" type="stmt" count="1"/>
         <line num="104" type="stmt" count="4"/>
         <line num="106" type="stmt" count="4"/>
         <line num="107" type="stmt" count="4"/>
@@ -472,7 +472,7 @@
         <line num="210" type="stmt" count="6"/>
         <line num="211" type="stmt" count="3"/>
         <line num="214" type="stmt" count="3"/>
-        <metrics loc="217" ncloc="147" classes="1" methods="12" coveredmethods="4" conditionals="0" coveredconditionals="0" statements="51" coveredstatements="35" elements="63" coveredelements="39"/>
+        <metrics loc="217" ncloc="147" classes="1" methods="12" coveredmethods="4" conditionals="0" coveredconditionals="0" statements="51" coveredstatements="34" elements="63" coveredelements="38"/>
       </file>
       <file name="/Users/vince/WWW/kasi/framework/src/Concerns/RoutesRequests.php">
         <class name="Laravel\Lumen\Concerns\RoutesRequests" namespace="Laravel\Lumen\Concerns">
@@ -1654,6 +1654,6 @@
       <line num="436" type="stmt" count="0"/>
       <metrics loc="439" ncloc="262" classes="0" methods="0" coveredmethods="0" conditionals="0" coveredconditionals="0" statements="79" coveredstatements="18" elements="79" coveredelements="18"/>
     </file>
-    <metrics files="26" loc="5724" ncloc="3710" classes="24" methods="294" coveredmethods="128" conditionals="0" coveredconditionals="0" statements="1183" coveredstatements="610" elements="1477" coveredelements="738"/>
+    <metrics files="26" loc="5724" ncloc="3710" classes="24" methods="294" coveredmethods="128" conditionals="0" coveredconditionals="0" statements="1183" coveredstatements="609" elements="1477" coveredelements="737"/>
   </project>
 </coverage>
