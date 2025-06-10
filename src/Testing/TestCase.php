@@ -16,6 +16,12 @@ use Mockery;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
+/**
+ * @method void runDatabaseMigrations()
+ * @method void beginDatabaseTransaction()
+ * @method void disableMiddlewareForAllTests()
+ * @method void disableEventsForAllTests()
+ */
 abstract class TestCase extends BaseTestCase
 {
   /**

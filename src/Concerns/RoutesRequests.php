@@ -122,7 +122,7 @@ trait RoutesRequests
       $this->callTerminableMiddleware($response);
     }
 
-    $this->app->terminate();
+    $this->terminate();
   }
 
   /**

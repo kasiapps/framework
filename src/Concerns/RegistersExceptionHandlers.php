@@ -73,7 +73,9 @@ trait RegistersExceptionHandlers
   {
     if ((error_reporting() & $level) !== 0) {
       if ($this->isDeprecation($level)) {
-        return $this->handleDeprecation($message, $file, $line);
+        $this->handleDeprecation($message, $file, $line);
+
+        return null;
       }
 
       throw new ErrorException($message, 0, $level, $file, $line);

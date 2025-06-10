@@ -135,7 +135,7 @@ class ConsoleServiceProvider extends ServiceProvider
    */
   protected function registerCacheTableCommand()
   {
-    $this->app->singleton('command.cache.table', fn ($app): CacheTableCommand => new CacheTableCommand($app['files'], $app['composer']));
+    $this->app->singleton('command.cache.table', fn ($app): CacheTableCommand => new CacheTableCommand($app['files']));
   }
 
   /**
@@ -324,7 +324,7 @@ class ConsoleServiceProvider extends ServiceProvider
    */
   protected function registerQueueFailedTableCommand()
   {
-    $this->app->singleton('command.queue.failed-table', fn ($app): FailedTableCommand => new FailedTableCommand($app['files'], $app['composer']));
+    $this->app->singleton('command.queue.failed-table', fn ($app): FailedTableCommand => new FailedTableCommand($app['files']));
   }
 
   /**
@@ -334,7 +334,7 @@ class ConsoleServiceProvider extends ServiceProvider
    */
   protected function registerQueueBatchesTableCommand()
   {
-    $this->app->singleton('command.queue.batches-table', fn ($app): BatchesTableCommand => new BatchesTableCommand($app['files'], $app['composer']));
+    $this->app->singleton('command.queue.batches-table', fn ($app): BatchesTableCommand => new BatchesTableCommand($app['files']));
   }
 
   /**
@@ -344,7 +344,7 @@ class ConsoleServiceProvider extends ServiceProvider
    */
   protected function registerQueueTableCommand()
   {
-    $this->app->singleton('command.queue.table', fn ($app): TableCommand => new TableCommand($app['files'], $app['composer']));
+    $this->app->singleton('command.queue.table', fn ($app): TableCommand => new TableCommand($app['files']));
   }
 
   /**
@@ -354,7 +354,7 @@ class ConsoleServiceProvider extends ServiceProvider
    */
   protected function registerSeederMakeCommand()
   {
-    $this->app->singleton('command.seeder.make', fn ($app): SeederMakeCommand => new SeederMakeCommand($app['files'], $app['composer']));
+    $this->app->singleton('command.seeder.make', fn ($app): SeederMakeCommand => new SeederMakeCommand($app['files']));
   }
 
   /**
@@ -374,7 +374,7 @@ class ConsoleServiceProvider extends ServiceProvider
    */
   protected function registerWipeCommand()
   {
-    $this->app->singleton('command.wipe', fn ($app): WipeCommand => new WipeCommand($app['db']));
+    $this->app->singleton('command.wipe', fn (): WipeCommand => new WipeCommand());
   }
 
   /**

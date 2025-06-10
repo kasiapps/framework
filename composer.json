@@ -67,7 +67,7 @@
     "laravel/tinker": "^2.10",
     "mockery/mockery": "^1.6.12",
     "pestphp/pest": "^3.8",
-    "rector/rector": "^2.0.17",
+    "phpstan/phpstan": "^2.1",
     "zenphp/fixr": "^1.0"
   },
   "autoload": {
@@ -82,6 +82,12 @@
     "psr-4": {
       "Tests\\": "tests/"
     }
+  },
+  "scripts": {
+    "test": "pest",
+    "test:coverage": "pest --coverage --min=50",
+    "analyse": "phpstan analyse",
+    "analyse:fix": "phpstan analyse --generate-baseline"
   },
   "extra": {
     "branch-alias": {
