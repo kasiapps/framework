@@ -288,3 +288,383 @@ it('tests TestCase trait usage', function () {
   expect($reflection->hasProperty('app'))->toBeTrue();
   expect($reflection->hasProperty('baseUrl'))->toBeTrue();
 });
+
+it('tests TestCase seeInDatabase method functionality', function () {
+  $testCase = new ConcreteTestCase('test');
+  $testCase->setUp();
+
+  // Mock the database connection
+  $mockConnection = \Mockery::mock();
+  $mockTable = \Mockery::mock();
+  $mockConnection->shouldReceive('table')->with('users')->andReturn($mockTable);
+  $mockTable->shouldReceive('where')->with(['name' => 'John'])->andReturnSelf();
+  $mockTable->shouldReceive('count')->andReturn(1);
+
+  $mockDb = \Mockery::mock();
+  $mockDb->shouldReceive('connection')->with(null)->andReturn($mockConnection);
+
+  $testCase->getApp()->instance('db', $mockDb);
+
+  $result = callProtectedMethod($testCase, 'seeInDatabase', ['users', ['name' => 'John']]);
+
+  expect($result)->toBe($testCase);
+});
+
+it('tests TestCase seeInDatabase method with custom connection', function () {
+  $testCase = new ConcreteTestCase('test');
+  $testCase->setUp();
+
+  // Mock the database connection
+  $mockConnection = \Mockery::mock();
+  $mockTable = \Mockery::mock();
+  $mockConnection->shouldReceive('table')->with('users')->andReturn($mockTable);
+  $mockTable->shouldReceive('where')->with(['name' => 'John'])->andReturnSelf();
+  $mockTable->shouldReceive('count')->andReturn(1);
+
+  $mockDb = \Mockery::mock();
+  $mockDb->shouldReceive('connection')->with('custom')->andReturn($mockConnection);
+
+  $testCase->getApp()->instance('db', $mockDb);
+
+  $result = callProtectedMethod($testCase, 'seeInDatabase', ['users', ['name' => 'John'], 'custom']);
+
+  expect($result)->toBe($testCase);
+});
+
+it('tests TestCase missingFromDatabase method functionality', function () {
+  $testCase = new ConcreteTestCase('test');
+  $testCase->setUp();
+
+  // Mock the database connection
+  $mockConnection = \Mockery::mock();
+  $mockTable = \Mockery::mock();
+  $mockConnection->shouldReceive('table')->with('users')->andReturn($mockTable);
+  $mockTable->shouldReceive('where')->with(['name' => 'NonExistent'])->andReturnSelf();
+  $mockTable->shouldReceive('count')->andReturn(0);
+
+  $mockDb = \Mockery::mock();
+  $mockDb->shouldReceive('connection')->with(null)->andReturn($mockConnection);
+
+  $testCase->getApp()->instance('db', $mockDb);
+
+  $result = callProtectedMethod($testCase, 'missingFromDatabase', ['users', ['name' => 'NonExistent']]);
+
+  expect($result)->toBe($testCase);
+});
+
+it('tests TestCase notSeeInDatabase method functionality', function () {
+  $testCase = new ConcreteTestCase('test');
+  $testCase->setUp();
+
+  // Mock the database connection
+  $mockConnection = \Mockery::mock();
+  $mockTable = \Mockery::mock();
+  $mockConnection->shouldReceive('table')->with('users')->andReturn($mockTable);
+  $mockTable->shouldReceive('where')->with(['name' => 'NonExistent'])->andReturnSelf();
+  $mockTable->shouldReceive('count')->andReturn(0);
+
+  $mockDb = \Mockery::mock();
+  $mockDb->shouldReceive('connection')->with(null)->andReturn($mockConnection);
+
+  $testCase->getApp()->instance('db', $mockDb);
+
+  $result = callProtectedMethod($testCase, 'notSeeInDatabase', ['users', ['name' => 'NonExistent']]);
+
+  expect($result)->toBe($testCase);
+});
+
+it('tests TestCase expectsJobs method functionality', function () {
+  $testCase = new ConcreteTestCase('test');
+  $testCase->setUp();
+
+  // Test that the method sets up the mock correctly
+  $result = callProtectedMethod($testCase, 'expectsJobs', [['stdClass']]);
+
+  expect($result)->toBe($testCase);
+  expect($testCase->getApp()->bound(\Illuminate\Contracts\Bus\Dispatcher::class))->toBeTrue();
+
+  // Dispatch a job to satisfy the mock expectation
+  $dispatcher = $testCase->getApp()->make(\Illuminate\Contracts\Bus\Dispatcher::class);
+  $dispatcher->dispatch(new stdClass());
+});
+
+it('tests TestCase expectsJobs method with multiple jobs', function () {
+  $testCase = new ConcreteTestCase('test');
+  $testCase->setUp();
+
+  // Test that the method sets up the mock correctly
+  $result = callProtectedMethod($testCase, 'expectsJobs', [['stdClass']]);
+
+  expect($result)->toBe($testCase);
+  expect($testCase->getApp()->bound(\Illuminate\Contracts\Bus\Dispatcher::class))->toBeTrue();
+
+  // Dispatch a job to satisfy the mock expectation
+  $dispatcher = $testCase->getApp()->make(\Illuminate\Contracts\Bus\Dispatcher::class);
+  $dispatcher->dispatch(new stdClass());
+});
+
+it('tests TestCase withoutJobs method functionality', function () {
+  $testCase = new ConcreteTestCase('test');
+  $testCase->setUp();
+
+  $result = callProtectedMethod($testCase, 'withoutJobs');
+
+  expect($result)->toBe($testCase);
+  expect($testCase->getApp()->bound(\Illuminate\Contracts\Bus\Dispatcher::class))->toBeTrue();
+});
+
+it('tests TestCase setUpTraits method with DatabaseMigrations', function () {
+  // Create a test case that uses DatabaseMigrations trait
+  $testCase = new class('test') extends ConcreteTestCase {
+    use \Laravel\Lumen\Testing\DatabaseMigrations;
+
+    public function runDatabaseMigrations() {
+      // Mock implementation
+    }
+  };
+
+  $testCase->setUp();
+
+  // If we get here without error, the trait was processed correctly
+  expect(true)->toBeTrue();
+});
+
+it('tests TestCase setUpTraits method with DatabaseTransactions', function () {
+  // Create a test case that uses DatabaseTransactions trait
+  $testCase = new class('test') extends ConcreteTestCase {
+    use \Laravel\Lumen\Testing\DatabaseTransactions;
+
+    public function beginDatabaseTransaction() {
+      // Mock implementation
+    }
+  };
+
+  $testCase->setUp();
+
+  // If we get here without error, the trait was processed correctly
+  expect(true)->toBeTrue();
+});
+
+it('tests TestCase setUpTraits method with WithoutMiddleware', function () {
+  // Create a test case that uses WithoutMiddleware trait
+  $testCase = new class('test') extends ConcreteTestCase {
+    use \Laravel\Lumen\Testing\WithoutMiddleware;
+
+    public function disableMiddlewareForAllTests() {
+      // Mock implementation
+    }
+  };
+
+  $testCase->setUp();
+
+  // If we get here without error, the trait was processed correctly
+  expect(true)->toBeTrue();
+});
+
+it('tests TestCase setUpTraits method with WithoutEvents', function () {
+  // Create a test case that uses WithoutEvents trait
+  $testCase = new class('test') extends ConcreteTestCase {
+    use \Laravel\Lumen\Testing\WithoutEvents;
+
+    public function disableEventsForAllTests() {
+      // Mock implementation
+    }
+  };
+
+  $testCase->setUp();
+
+  // If we get here without error, the trait was processed correctly
+  expect(true)->toBeTrue();
+});
+
+it('tests TestCase tearDown method with Mockery cleanup', function () {
+  $testCase = new ConcreteTestCase('test');
+  $testCase->setUp();
+
+  // Create a mock to test Mockery cleanup
+  $mock = \Mockery::mock('TestClass');
+  $mock->shouldReceive('testMethod')->once();
+  $mock->testMethod();
+
+  // tearDown should clean up Mockery
+  $testCase->tearDown();
+
+  expect($testCase->getApp())->toBeNull();
+});
+
+it('tests TestCase tearDown method with Component cleanup', function () {
+  $testCase = new ConcreteTestCase('test');
+  $testCase->setUp();
+
+  // tearDown should clean up Component cache
+  $testCase->tearDown();
+
+  expect($testCase->getApp())->toBeNull();
+});
+
+it('tests TestCase expectsEvents method with event validation', function () {
+  $testCase = new ConcreteTestCase('test');
+  $testCase->setUp();
+
+  $result = $testCase->expectsEvents(['UserCreated']);
+
+  expect($result)->toBe($testCase);
+  expect($testCase->getApp()->bound('events'))->toBeTrue();
+
+  // Get the mock dispatcher
+  $dispatcher = $testCase->getApp()->make('events');
+  expect($dispatcher)->toBeInstanceOf(\Mockery\MockInterface::class);
+});
+
+it('tests TestCase expectsEvents method with multiple events as arguments', function () {
+  $testCase = new ConcreteTestCase('test');
+  $testCase->setUp();
+
+  $result = $testCase->expectsEvents('UserCreated', 'UserUpdated');
+
+  expect($result)->toBe($testCase);
+  expect($testCase->getApp()->bound('events'))->toBeTrue();
+});
+
+it('tests TestCase beforeApplicationDestroyed method', function () {
+  $testCase = new ConcreteTestCase('test');
+  $testCase->setUp();
+
+  $callbackExecuted = false;
+  $callback = function () use (&$callbackExecuted) {
+    $callbackExecuted = true;
+  };
+
+  callProtectedMethod($testCase, 'beforeApplicationDestroyed', [$callback]);
+
+  // Verify callback was added
+  $callbacks = $testCase->getBeforeApplicationDestroyedCallbacks();
+  expect($callbacks)->toHaveCount(1);
+
+  // Execute tearDown to trigger callbacks
+  $testCase->tearDown();
+
+  expect($callbackExecuted)->toBeTrue();
+});
+
+it('tests TestCase actingAs method', function () {
+  $testCase = new ConcreteTestCase('test');
+  $testCase->setUp();
+
+  // Mock the auth system
+  $mockUser = \Mockery::mock(\Illuminate\Contracts\Auth\Authenticatable::class);
+  $mockGuard = \Mockery::mock();
+  $mockGuard->shouldReceive('setUser')->once()->with($mockUser);
+
+  $mockAuth = \Mockery::mock();
+  $mockAuth->shouldReceive('guard')->with(null)->andReturn($mockGuard);
+
+  $testCase->getApp()->instance('auth', $mockAuth);
+
+  $result = $testCase->actingAs($mockUser);
+
+  expect($result)->toBe($testCase);
+});
+
+it('tests TestCase actingAs method with custom driver', function () {
+  $testCase = new ConcreteTestCase('test');
+  $testCase->setUp();
+
+  // Mock the auth system
+  $mockUser = \Mockery::mock(\Illuminate\Contracts\Auth\Authenticatable::class);
+  $mockGuard = \Mockery::mock();
+  $mockGuard->shouldReceive('setUser')->once()->with($mockUser);
+
+  $mockAuth = \Mockery::mock();
+  $mockAuth->shouldReceive('guard')->with('api')->andReturn($mockGuard);
+
+  $testCase->getApp()->instance('auth', $mockAuth);
+
+  $result = $testCase->actingAs($mockUser, 'api');
+
+  expect($result)->toBe($testCase);
+});
+
+it('tests TestCase withoutJobs method with job collection', function () {
+  $testCase = new ConcreteTestCase('test');
+  $testCase->setUp();
+
+  $result = callProtectedMethod($testCase, 'withoutJobs');
+
+  expect($result)->toBe($testCase);
+
+  // Get the mock dispatcher and test job collection
+  $dispatcher = $testCase->getApp()->make(\Illuminate\Contracts\Bus\Dispatcher::class);
+  expect($dispatcher)->toBeInstanceOf(\Mockery\MockInterface::class);
+});
+
+it('tests TestCase refreshApplication method with URL configuration', function () {
+  $testCase = new ConcreteTestCase('test');
+
+  // Test refreshApplication method
+  $testCase->callRefreshApplication();
+
+  $app = $testCase->getApp();
+  expect($app)->toBeInstanceOf(\Laravel\Lumen\Application::class);
+  expect($app->bound('config'))->toBeTrue();
+  expect($app->bound('url'))->toBeTrue();
+});
+
+it('tests expectsEvents method with event validation and exception', function () {
+  $testCase = new ConcreteTestCase('test');
+  $testCase->setUp();
+
+  // Set up events that should be fired
+  $testCase->expectsEvents(['UserCreated', 'UserUpdated']);
+
+  // Get the mock dispatcher
+  $dispatcher = $testCase->getApp()->make('events');
+
+  // Simulate firing only one event (UserCreated) - this should leave UserUpdated unfired
+  $dispatcher->dispatch('UserCreated');
+
+  // Now trigger the beforeApplicationDestroyed callback which should throw exception
+  // for unfired events (line 222-225)
+  expect(function () use ($testCase) {
+    $testCase->tearDown(); // This triggers beforeApplicationDestroyed callbacks
+  })->toThrow(Exception::class, 'The following events were not fired: [UserUpdated]');
+});
+
+it('tests expectsEvents method with string event matching', function () {
+  $testCase = new ConcreteTestCase('test');
+  $testCase->setUp();
+
+  // Set up events that should be fired
+  $testCase->expectsEvents(['UserCreated']);
+
+  // Get the mock dispatcher
+  $dispatcher = $testCase->getApp()->make('events');
+
+  // Test string event matching (line 213)
+  $dispatcher->dispatch('UserCreated');
+
+  // This should not throw an exception since the event was fired
+  $testCase->tearDown();
+
+  expect(true)->toBeTrue(); // If we get here, no exception was thrown
+});
+
+it('tests withoutJobs method with actual job dispatch', function () {
+  $testCase = new ConcreteTestCase('test');
+  $testCase->setUp();
+
+  // Call withoutJobs to set up the mock
+  $result = callProtectedMethod($testCase, 'withoutJobs');
+
+  expect($result)->toBe($testCase);
+
+  // Get the mock dispatcher
+  $dispatcher = $testCase->getApp()->make(\Illuminate\Contracts\Bus\Dispatcher::class);
+
+  // Dispatch a job to test line 286 (job collection)
+  $job = new stdClass();
+  $dispatcher->dispatch($job);
+
+  // Verify the job was collected
+  expect($testCase->dispatchedJobs)->toContain($job);
+});

@@ -533,3 +533,174 @@ it('tests seeJsonDoesntContains method', function () {
     $result = $method->invoke($testInstance, ['name' => 'John']);
     expect($result)->toBe($testInstance);
 });
+
+it('tests get method with headers', function () {
+  $testInstance = createHttpRequestsTestInstance();
+
+  // Mock the app with ArrayAccess support
+  $mockApp = m::mock('ArrayAccess');
+  $mockRequest = m::mock('Laravel\Lumen\Http\Request');
+  $mockResponse = m::mock('Illuminate\Http\Response');
+
+  $mockApp->shouldReceive('offsetSet')->with('request', m::type('Laravel\Lumen\Http\Request'));
+  $mockApp->shouldReceive('offsetGet')->with('request')->andReturn($mockRequest);
+  $mockApp->shouldReceive('prepareResponse')->andReturn($mockResponse);
+  $mockApp->shouldReceive('handle')->andReturn($mockResponse);
+
+  $testInstance->setApp($mockApp);
+  $testInstance->baseUrl = 'http://localhost';
+
+  $result = $testInstance->get('/api/test', ['Accept' => 'application/json']);
+
+  expect($result)->toBe($testInstance);
+});
+
+it('tests post method with data and headers', function () {
+  $testInstance = createHttpRequestsTestInstance();
+
+  // Mock the app with ArrayAccess support
+  $mockApp = m::mock('ArrayAccess');
+  $mockRequest = m::mock('Laravel\Lumen\Http\Request');
+  $mockResponse = m::mock('Illuminate\Http\Response');
+
+  $mockApp->shouldReceive('offsetSet')->with('request', m::type('Laravel\Lumen\Http\Request'));
+  $mockApp->shouldReceive('offsetGet')->with('request')->andReturn($mockRequest);
+  $mockApp->shouldReceive('prepareResponse')->andReturn($mockResponse);
+  $mockApp->shouldReceive('handle')->andReturn($mockResponse);
+
+  $testInstance->setApp($mockApp);
+  $testInstance->baseUrl = 'http://localhost';
+
+  $result = $testInstance->post('/api/users', ['name' => 'John'], ['Content-Type' => 'application/json']);
+
+  expect($result)->toBe($testInstance);
+});
+
+it('tests put method with data and headers', function () {
+  $testInstance = createHttpRequestsTestInstance();
+
+  // Mock the app with ArrayAccess support
+  $mockApp = m::mock('ArrayAccess');
+  $mockRequest = m::mock('Laravel\Lumen\Http\Request');
+  $mockResponse = m::mock('Illuminate\Http\Response');
+
+  $mockApp->shouldReceive('offsetSet')->with('request', m::type('Laravel\Lumen\Http\Request'));
+  $mockApp->shouldReceive('offsetGet')->with('request')->andReturn($mockRequest);
+  $mockApp->shouldReceive('prepareResponse')->andReturn($mockResponse);
+  $mockApp->shouldReceive('handle')->andReturn($mockResponse);
+
+  $testInstance->setApp($mockApp);
+  $testInstance->baseUrl = 'http://localhost';
+
+  $result = $testInstance->put('/api/users/1', ['name' => 'John Updated'], ['Content-Type' => 'application/json']);
+
+  expect($result)->toBe($testInstance);
+});
+
+it('tests patch method with data and headers', function () {
+  $testInstance = createHttpRequestsTestInstance();
+
+  // Mock the app with ArrayAccess support
+  $mockApp = m::mock('ArrayAccess');
+  $mockRequest = m::mock('Laravel\Lumen\Http\Request');
+  $mockResponse = m::mock('Illuminate\Http\Response');
+
+  $mockApp->shouldReceive('offsetSet')->with('request', m::type('Laravel\Lumen\Http\Request'));
+  $mockApp->shouldReceive('offsetGet')->with('request')->andReturn($mockRequest);
+  $mockApp->shouldReceive('prepareResponse')->andReturn($mockResponse);
+  $mockApp->shouldReceive('handle')->andReturn($mockResponse);
+
+  $testInstance->setApp($mockApp);
+  $testInstance->baseUrl = 'http://localhost';
+
+  $result = $testInstance->patch('/api/users/1', ['name' => 'John Patched'], ['Content-Type' => 'application/json']);
+
+  expect($result)->toBe($testInstance);
+});
+
+it('tests delete method with data and headers', function () {
+  $testInstance = createHttpRequestsTestInstance();
+
+  // Mock the app with ArrayAccess support
+  $mockApp = m::mock('ArrayAccess');
+  $mockRequest = m::mock('Laravel\Lumen\Http\Request');
+  $mockResponse = m::mock('Illuminate\Http\Response');
+
+  $mockApp->shouldReceive('offsetSet')->with('request', m::type('Laravel\Lumen\Http\Request'));
+  $mockApp->shouldReceive('offsetGet')->with('request')->andReturn($mockRequest);
+  $mockApp->shouldReceive('prepareResponse')->andReturn($mockResponse);
+  $mockApp->shouldReceive('handle')->andReturn($mockResponse);
+
+  $testInstance->setApp($mockApp);
+  $testInstance->baseUrl = 'http://localhost';
+
+  $result = $testInstance->delete('/api/users/1', [], ['Authorization' => 'Bearer token']);
+
+  expect($result)->toBe($testInstance);
+});
+
+it('tests options method with data and headers', function () {
+  $testInstance = createHttpRequestsTestInstance();
+
+  // Mock the app with ArrayAccess support
+  $mockApp = m::mock('ArrayAccess');
+  $mockRequest = m::mock('Laravel\Lumen\Http\Request');
+  $mockResponse = m::mock('Illuminate\Http\Response');
+
+  $mockApp->shouldReceive('offsetSet')->with('request', m::type('Laravel\Lumen\Http\Request'));
+  $mockApp->shouldReceive('offsetGet')->with('request')->andReturn($mockRequest);
+  $mockApp->shouldReceive('prepareResponse')->andReturn($mockResponse);
+  $mockApp->shouldReceive('handle')->andReturn($mockResponse);
+
+  $testInstance->setApp($mockApp);
+  $testInstance->baseUrl = 'http://localhost';
+
+  $result = $testInstance->options('/api/users', [], ['Origin' => 'http://example.com']);
+
+  expect($result)->toBe($testInstance);
+});
+
+it('tests head method with data and headers', function () {
+  $testInstance = createHttpRequestsTestInstance();
+
+  // Mock the app with ArrayAccess support
+  $mockApp = m::mock('ArrayAccess');
+  $mockRequest = m::mock('Laravel\Lumen\Http\Request');
+  $mockResponse = m::mock('Illuminate\Http\Response');
+
+  $mockApp->shouldReceive('offsetSet')->with('request', m::type('Laravel\Lumen\Http\Request'));
+  $mockApp->shouldReceive('offsetGet')->with('request')->andReturn($mockRequest);
+  $mockApp->shouldReceive('prepareResponse')->andReturn($mockResponse);
+  $mockApp->shouldReceive('handle')->andReturn($mockResponse);
+
+  $testInstance->setApp($mockApp);
+  $testInstance->baseUrl = 'http://localhost';
+
+  $result = $testInstance->head('/api/users', [], ['Accept' => 'application/json']);
+
+  expect($result)->toBe($testInstance);
+});
+
+it('tests formatToExpectedJson method with edge cases', function () {
+  $testInstance = createHttpRequestsTestInstance();
+
+  // Use reflection to access the protected method
+  $method = new ReflectionMethod($testInstance, 'formatToExpectedJson');
+  $method->setAccessible(true);
+
+  // Test normal case
+  $result = $method->invoke($testInstance, 'name', 'John');
+  expect($result)->toBe('"name":"John"');
+
+  // Test with array value
+  $result = $method->invoke($testInstance, 'data', ['a', 'b']);
+  expect($result)->toBe('"data":["a","b"]');
+
+  // Test with null value
+  $result = $method->invoke($testInstance, 'value', null);
+  expect($result)->toBe('"value":null');
+
+  // Test with boolean value
+  $result = $method->invoke($testInstance, 'active', true);
+  expect($result)->toBe('"active":true');
+});

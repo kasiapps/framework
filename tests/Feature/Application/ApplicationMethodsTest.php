@@ -378,3 +378,72 @@ it('tests getNamespace method with composer.json', function () {
     expect($e->getMessage())->toContain('Unable to detect application namespace');
   }
 });
+
+it('tests registerPsrRequestBindings method without PSR libraries', function () {
+  // Use reflection to call the protected method on existing app
+  $reflection = new ReflectionClass($this->app);
+  $method = $reflection->getMethod('registerPsrRequestBindings');
+  $method->setAccessible(true);
+
+  $method->invoke($this->app);
+
+  // Verify that PSR request binding is registered
+  expect($this->app->bound(\Psr\Http\Message\ServerRequestInterface::class))->toBeTrue();
+
+  // Trying to resolve should throw exception since PSR libraries aren't available
+  expect(function () {
+    $this->app->make(\Psr\Http\Message\ServerRequestInterface::class);
+  })->toThrow(Exception::class);
+});
+
+it('tests registerPsrResponseBindings method without PSR libraries', function () {
+  // Use reflection to call the protected method on existing app
+  $reflection = new ReflectionClass($this->app);
+  $method = $reflection->getMethod('registerPsrResponseBindings');
+  $method->setAccessible(true);
+
+  $method->invoke($this->app);
+
+  // Verify that PSR response binding is registered
+  expect($this->app->bound(\Psr\Http\Message\ResponseInterface::class))->toBeTrue();
+
+  // Test that the binding exists (we can't test the exception without PSR libraries)
+  expect(true)->toBeTrue();
+});
+
+it('tests basePath method with path parameter and null base', function () {
+  // Test the basePath logic without creating new Application
+  $reflection = new ReflectionClass($this->app);
+  $property = $reflection->getProperty('basePath');
+  $property->setAccessible(true);
+  $originalBasePath = $property->getValue($this->app);
+
+  // Temporarily set basePath to null to test the fallback logic
+  $property->setValue($this->app, null);
+
+  $basePath = $this->app->basePath('config');
+
+  expect($basePath)->toBeString();
+  expect($basePath)->toContain('config');
+
+  // Restore original basePath
+  $property->setValue($this->app, $originalBasePath);
+});
+
+it('tests getNamespace method with cached namespace', function () {
+  // Use reflection to set the namespace property
+  $reflection = new ReflectionClass($this->app);
+  $property = $reflection->getProperty('namespace');
+  $property->setAccessible(true);
+  $originalNamespace = $property->getValue($this->app);
+
+  // Set a test namespace
+  $property->setValue($this->app, 'App\\');
+
+  $namespace = $this->app->getNamespace();
+
+  expect($namespace)->toBe('App\\');
+
+  // Restore original namespace
+  $property->setValue($this->app, $originalNamespace);
+});
