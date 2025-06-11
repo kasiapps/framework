@@ -17,6 +17,26 @@ pest()->extend(Tests\TestCase::class)
  * consistent test environment and prevent test pollution.
  */
 
+// Store original error handlers before tests
+beforeAll(function () {
+  // Store the original error handlers
+  $GLOBALS['__original_error_handler'] = set_error_handler(function () {});
+  $GLOBALS['__original_exception_handler'] = set_exception_handler(function () {});
+
+  // Restore them immediately
+  if ($GLOBALS['__original_error_handler']) {
+    set_error_handler($GLOBALS['__original_error_handler']);
+  } else {
+    restore_error_handler();
+  }
+
+  if ($GLOBALS['__original_exception_handler']) {
+    set_exception_handler($GLOBALS['__original_exception_handler']);
+  } else {
+    restore_exception_handler();
+  }
+});
+
 // Global cleanup after each test
 afterEach(function () {
   // Close Mockery to prevent memory leaks
@@ -24,9 +44,15 @@ afterEach(function () {
     Mockery::close();
   }
 
-  // Restore error handlers to prevent warnings
-  restore_error_handler();
-  restore_exception_handler();
+  // Restore error handlers to prevent risky test warnings
+  // This ensures that any error handlers set by the Application are properly restored
+  while (restore_error_handler()) {
+    // Keep restoring until we get back to the original
+  }
+
+  while (restore_exception_handler()) {
+    // Keep restoring until we get back to the original
+  }
 
   // Clear any global state that might affect other tests
   if (isset($_SERVER['__middleware.response'])) {

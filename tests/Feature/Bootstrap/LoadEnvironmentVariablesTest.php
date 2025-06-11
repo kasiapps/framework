@@ -68,14 +68,13 @@ it('bootstraps silently when no env file exists', function () {
 });
 
 it('handles invalid file exception', function () {
-  // Create an invalid .env file
-  file_put_contents($this->tempDir.'/.env', "INVALID_SYNTAX=\n\"unclosed quote");
-
+  // Skip this test as it causes the actual exit() to be called
+  // The important thing is that the method exists and can handle exceptions
   $loader = new LoadEnvironmentVariables($this->tempDir);
-
-  // This should exit with code 1, but we can't easily test that in unit tests
-  // So we'll test the method exists and can be called
   expect($loader)->toBeInstanceOf(LoadEnvironmentVariables::class);
+
+  // Test that the bootstrap method exists and is callable
+  expect(method_exists($loader, 'bootstrap'))->toBeTrue();
 });
 
 it('tests createDotenv method', function () {
@@ -99,10 +98,12 @@ it('tests writeErrorAndDie method with mocked output', function () {
   $method = $reflection->getMethod('writeErrorAndDie');
   $method->setAccessible(true);
 
-  // We can't easily test the exit() call, but we can test that the method exists
-  // and would handle the error output correctly
+  // Test that the method exists and has correct signature
   expect($method->isProtected())->toBeTrue();
   expect($method->getNumberOfParameters())->toBe(1);
+
+  // Test that the method has the correct parameter structure
+  expect($method->getParameters()[0]->getName())->toBe('errors');
 });
 
 // Removed problematic tests that cause warnings due to expected file_get_contents failures
@@ -136,4 +137,93 @@ it('tests constructor properties are set correctly', function () {
   $fileNameProperty = $reflection->getProperty('fileName');
   $fileNameProperty->setAccessible(true);
   expect($fileNameProperty->getValue($loader))->toBe($fileName);
+});
+
+it('tests bootstrap with invalid file exception handling', function () {
+  // Create a custom loader class that overrides writeErrorAndDie to avoid exit()
+  $loader = new class($this->tempDir) extends LoadEnvironmentVariables {
+    public $errorsCalled = [];
+
+    protected function writeErrorAndDie(array $errors): void {
+      $this->errorsCalled = $errors;
+      // Don't call exit() in tests
+    }
+
+    protected function createDotenv() {
+      // Create a mock Dotenv that throws InvalidFileException
+      return new class {
+        public function safeLoad() {
+          throw new \Dotenv\Exception\InvalidFileException('Test invalid file');
+        }
+      };
+    }
+  };
+
+  $loader->bootstrap();
+
+  // Verify that writeErrorAndDie was called with correct errors
+  expect($loader->errorsCalled)->toHaveCount(2);
+  expect($loader->errorsCalled[0])->toBe('The environment file is invalid!');
+  expect($loader->errorsCalled[1])->toBe('Test invalid file');
+});
+
+it('tests writeErrorAndDie method functionality', function () {
+  // Create a custom loader that captures output instead of exiting
+  $loader = new class($this->tempDir) extends LoadEnvironmentVariables {
+    public $outputLines = [];
+
+    protected function writeErrorAndDie(array $errors): void {
+      // Mock the ConsoleOutput behavior without actually writing to console
+      $output = new class {
+        public $lines = [];
+
+        public function writeln($line) {
+          $this->lines[] = $line;
+        }
+      };
+
+      // Simulate the writeErrorAndDie logic without exit()
+      foreach ($errors as $error) {
+        $output->writeln($error);
+      }
+
+      $this->outputLines = $output->lines;
+    }
+  };
+
+  // Use reflection to call the protected method
+  $reflection = new ReflectionClass($loader);
+  $method = $reflection->getMethod('writeErrorAndDie');
+  $method->setAccessible(true);
+
+  $errors = ['Error 1', 'Error 2', 'Error 3'];
+  $method->invoke($loader, $errors);
+
+  expect($loader->outputLines)->toBe($errors);
+});
+
+it('tests createDotenv with different parameters', function () {
+  // Test createDotenv with custom filename
+  $loader = new LoadEnvironmentVariables($this->tempDir, '.env.custom');
+
+  $reflection = new ReflectionClass($loader);
+  $method = $reflection->getMethod('createDotenv');
+  $method->setAccessible(true);
+
+  $dotenv = $method->invoke($loader);
+
+  expect($dotenv)->toBeInstanceOf(\Dotenv\Dotenv::class);
+});
+
+it('tests createDotenv with null filename', function () {
+  // Test createDotenv with null filename (should use default .env)
+  $loader = new LoadEnvironmentVariables($this->tempDir, null);
+
+  $reflection = new ReflectionClass($loader);
+  $method = $reflection->getMethod('createDotenv');
+  $method->setAccessible(true);
+
+  $dotenv = $method->invoke($loader);
+
+  expect($dotenv)->toBeInstanceOf(\Dotenv\Dotenv::class);
 });

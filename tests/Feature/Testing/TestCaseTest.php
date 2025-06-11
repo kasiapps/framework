@@ -253,3 +253,38 @@ it('tests TestCase beforeApplicationDestroyed callback', function () {
 
   expect($callbackExecuted)->toBeTrue();
 });
+
+it('tests TestCase seeInDatabase method exists', function () {
+  $testCase = new ConcreteTestCase('test');
+  $testCase->setUp();
+
+  // Test that the method exists and can be called
+  expect(method_exists($testCase, 'seeInDatabase'))->toBeTrue();
+});
+
+it('tests TestCase missingFromDatabase method exists', function () {
+  $testCase = new ConcreteTestCase('test');
+  $testCase->setUp();
+
+  // Test that the method exists and can be called
+  expect(method_exists($testCase, 'missingFromDatabase'))->toBeTrue();
+});
+
+it('tests TestCase expectsJobs method exists', function () {
+  $testCase = new ConcreteTestCase('test');
+  $testCase->setUp();
+
+  // Test that the method exists and can be called
+  expect(method_exists($testCase, 'expectsJobs'))->toBeTrue();
+});
+
+it('tests TestCase trait usage', function () {
+  $testCase = new ConcreteTestCase('test');
+  $testCase->setUp();
+
+  // Test that the TestCase class structure is correct
+  $reflection = new ReflectionClass($testCase);
+
+  expect($reflection->hasProperty('app'))->toBeTrue();
+  expect($reflection->hasProperty('baseUrl'))->toBeTrue();
+});
