@@ -101,3 +101,65 @@ it('does not dispatch unique job when lock not acquired', function () {
   $pendingDispatch = new PendingDispatch($job);
   unset($pendingDispatch);
 });
+
+it('dispatches unique job with uniqueId method', function () {
+  // Test line 65: $this->job->uniqueId()
+  $job = new class implements ShouldBeUnique
+  {
+    public $uniqueFor = 60;
+
+    public function uniqueId(): string
+    {
+      return 'method-generated-id';
+    }
+  };
+
+  $cache = m::mock(Cache::class);
+  $lock = m::mock();
+
+  app()->instance(Cache::class, $cache);
+
+  $cache->shouldReceive('lock')
+    ->with('laravel_unique_job:'.get_class($job).'method-generated-id', 60)
+    ->once()
+    ->andReturn($lock);
+
+  $lock->shouldReceive('get')->once()->andReturn(true);
+
+  $this->dispatcher->shouldReceive('dispatch')->with($job)->once();
+
+  $pendingDispatch = new PendingDispatch($job);
+  unset($pendingDispatch);
+});
+
+it('dispatches unique job with uniqueVia method', function () {
+  // Test line 69: $this->job->uniqueVia()
+  $customCache = m::mock(Cache::class);
+
+  $job = new class($customCache) implements ShouldBeUnique
+  {
+    public $uniqueId = 'test-id';
+    public $uniqueFor = 60;
+
+    public function __construct(private $customCache) {}
+
+    public function uniqueVia()
+    {
+      return $this->customCache;
+    }
+  };
+
+  $lock = m::mock();
+
+  $customCache->shouldReceive('lock')
+    ->with('laravel_unique_job:'.get_class($job).'test-id', 60)
+    ->once()
+    ->andReturn($lock);
+
+  $lock->shouldReceive('get')->once()->andReturn(true);
+
+  $this->dispatcher->shouldReceive('dispatch')->with($job)->once();
+
+  $pendingDispatch = new PendingDispatch($job);
+  unset($pendingDispatch);
+});

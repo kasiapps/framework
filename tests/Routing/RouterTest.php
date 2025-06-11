@@ -61,3 +61,47 @@ it('checks if router has group stack', function () {
 
   expect($router->hasGroupStack())->toBeFalse();
 });
+
+it('registers HEAD routes', function () {
+  $router = new Router(createApp());
+
+  $router->head('/api/status', 'StatusController@head');
+
+  $routes = $router->getRoutes();
+  expect($routes)->toHaveKey('HEAD/api/status');
+  expect($routes['HEAD/api/status']['method'])->toBe('HEAD');
+});
+
+it('registers PUT routes', function () {
+  $router = new Router(createApp());
+
+  $router->put('/users/{id}', 'UserController@update');
+
+  $routes = $router->getRoutes();
+  expect($routes)->toHaveKey('PUT/users/{id}');
+  expect($routes['PUT/users/{id}']['method'])->toBe('PUT');
+});
+
+it('registers PATCH routes', function () {
+  $router = new Router(createApp());
+
+  $router->patch('/users/{id}', 'UserController@patch');
+
+  $routes = $router->getRoutes();
+  expect($routes)->toHaveKey('PATCH/users/{id}');
+  expect($routes['PATCH/users/{id}']['method'])->toBe('PATCH');
+});
+
+it('merges group attributes with domain handling', function () {
+  $router = new Router(createApp());
+
+  // Test the domain unset logic (line 89)
+  $new = ['domain' => 'api.example.com', 'prefix' => 'v1'];
+  $old = ['domain' => 'old.example.com', 'middleware' => ['auth']];
+
+  $merged = $router->mergeGroup($new, $old);
+
+  expect($merged['domain'])->toBe('api.example.com');
+  expect($merged)->not->toHaveKey('old'); // old domain should be unset
+  expect($merged['middleware'])->toBe(['auth']);
+});

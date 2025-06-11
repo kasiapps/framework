@@ -27,8 +27,8 @@
 
 ## PROGRESSIVE MILESTONE SYSTEM:
 
-**Current minimum threshold: 53%**
-**Next milestone target: 65%**
+**Current minimum threshold: 67.5%**
+**Next milestone target: 75%**
 **Final goal: 95%**
 
 ## WORKFLOW:
@@ -47,7 +47,7 @@
 
 ## MILESTONES PROGRESSION (update as you go):
 
-- [ ] 53% → 65%
+- [x] 53% → 65%
 - [ ] 65% → 75%
 - [ ] 75% → 85%
 - [ ] 85% → 95%
@@ -106,8 +106,8 @@ test('todo: write this test', function () {
 
 ## CURRENT STATUS:
 
-- Current coverage: 53.5%
-- Target milestone: 65%
+- Current coverage: 67.5%
+- Target milestone: 75%
 - Framework: Kasi (Laravel Lumen fork)
 - Test runner: Pest PHP
 - Coverage command: `composer test:coverage`

@@ -5,9 +5,9 @@ declare(strict_types=1);
 use Laravel\Lumen\Application;
 
 afterEach(function () {
-    // Restore error handlers to prevent warnings
-    restore_error_handler();
-    restore_exception_handler();
+  // Restore error handlers to prevent warnings
+  restore_error_handler();
+  restore_exception_handler();
 });
 
 it('gets application version', function () {
