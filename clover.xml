@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1749606511">
-  <project timestamp="1749606511">
+<coverage generated="1749608254">
+  <project timestamp="1749608254">
     <package name="Laravel\Lumen">
       <file name="/Users/vince/WWW/kasi/framework/src/Application.php">
         <class name="Laravel\Lumen\Application" namespace="Laravel\Lumen">
