@@ -72,8 +72,8 @@ test('user can update profile', function () {
 
 ## PROGRESSIVE MILESTONE SYSTEM:
 
-**Current minimum threshold: 75.6%**
-**Next milestone target: 85%**
+**Current minimum threshold: 85.9%**
+**Next milestone target: 95%**
 **Final goal: 95%**
 
 ## WORKFLOW:
@@ -94,7 +94,7 @@ test('user can update profile', function () {
 
 - [x] 53% → 65%
 - [x] 65% → 75%
-- [ ] 75% → 85%
+- [x] 75% → 85%
 - [ ] 85% → 95%
 
 ## INSTRUCTIONS:
@@ -177,8 +177,8 @@ test('todo: write this test', function () {
 
 ## CURRENT STATUS:
 
-- Current coverage: 75.6%
-- Target milestone: 85%
+- Current coverage: 85.9%
+- Target milestone: 95%
 - Framework: Kasi (Laravel Lumen fork)
 - Test runner: Pest PHP
 - Coverage command: `composer test:coverage`
