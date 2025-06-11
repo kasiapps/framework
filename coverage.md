@@ -16,6 +16,51 @@
 - **Each test method should test ONE specific behavior**
 - **Use descriptive test names** that explain what is being tested
 
+## LEVERAGE TEST INFRASTRUCTURE - REQUIRED:
+
+- **Use Pest.php for reusable functions** - Don't repeat setup code in every test
+- **Enhance TestCase.php** - Create robust Application instance and shared test utilities
+- **Create helper functions** for common test patterns (user creation, mocking, etc.)
+- **Use factories/fixtures** instead of manual object creation in each test
+- **Avoid risky tests** by using proper test infrastructure, not reinventing in each test
+
+### Examples of Good Test Infrastructure:
+
+**In tests/Pest.php:**
+
+```php
+function createTestUser(array $attributes = []): User {
+    return User::create(array_merge([
+        'name' => 'Test User',
+        'email' => 'test@example.com'
+    ], $attributes));
+}
+
+function mockAuthenticatedUser(): User {
+    $user = createTestUser();
+    Auth::login($user);
+    return $user;
+}
+```
+
+**In TestCase.php:**
+
+```php
+protected function setUp(): void {
+    parent::setUp();
+    // Proper application setup, database migrations, etc.
+}
+```
+
+**In tests (using helpers):**
+
+```php
+test('user can update profile', function () {
+    $user = createTestUser();
+    // Clean, reusable test code
+});
+```
+
 ## VERIFICATION BEFORE MILESTONE COMMIT:
 
 **BEFORE committing, you MUST verify:**
@@ -27,8 +72,8 @@
 
 ## PROGRESSIVE MILESTONE SYSTEM:
 
-**Current minimum threshold: 67.5%**
-**Next milestone target: 75%**
+**Current minimum threshold: 75.6%**
+**Next milestone target: 85%**
 **Final goal: 95%**
 
 ## WORKFLOW:
@@ -48,37 +93,48 @@
 ## MILESTONES PROGRESSION (update as you go):
 
 - [x] 53% → 65%
-- [ ] 65% → 75%
+- [x] 65% → 75%
 - [ ] 75% → 85%
 - [ ] 85% → 95%
 
 ## INSTRUCTIONS:
 
 1. **PRIORITIZE 0% coverage files** - Always target completely untested classes/files first for maximum coverage impact
-2. **Analyze uncovered code** - identify untested methods/classes/branches, starting with 0% files
-3. **Write QUALITY tests** - meaningful assertions that verify correct behavior
-4. **One file at a time** - work on single classes systematically
-5. **Ensure tests pass** with `composer test` after each addition
-6. **Check coverage** with `composer test:coverage`
-7. **Only ask for commit approval when ALL tests pass AND milestone reached**
+2. **Set up proper test infrastructure FIRST** - Enhance TestCase.php and add helper functions to Pest.php before writing individual tests
+3. **Analyze uncovered code** - identify untested methods/classes/branches, starting with 0% files
+4. **Write QUALITY tests** - meaningful assertions that verify correct behavior
+5. **Use reusable helpers** - Don't repeat setup code, leverage Pest.php functions
+6. **One file at a time** - work on single classes systematically
+7. **Ensure tests pass** with `composer test` after each addition
+8. **Check coverage** with `composer test:coverage`
+9. **Only ask for commit approval when ALL tests pass AND milestone reached**
 
 ## GOOD TEST EXAMPLES:
 
 ```php
-// ✅ GOOD - Tests specific behavior with meaningful assertions
+// ✅ GOOD - Uses helper functions from Pest.php
 test('user can be created with valid data', function () {
-    $userData = ['name' => 'John', 'email' => 'john@example.com'];
-    $user = User::create($userData);
+    $user = createTestUser(['name' => 'John', 'email' => 'john@example.com']);
 
     expect($user->name)->toBe('John');
     expect($user->email)->toBe('john@example.com');
     expect($user->exists)->toBeTrue();
 });
 
-// ✅ GOOD - Tests error conditions
+// ✅ GOOD - Tests error conditions with proper setup
 test('user creation fails with invalid email', function () {
-    expect(fn() => User::create(['email' => 'invalid']))
+    expect(fn() => createTestUser(['email' => 'invalid']))
         ->toThrow(ValidationException::class);
+});
+
+// ✅ GOOD - Uses authentication helper
+test('authenticated user can access dashboard', function () {
+    $user = mockAuthenticatedUser();
+
+    $response = $this->get('/dashboard');
+
+    expect($response->status())->toBe(200);
+    expect($response->content())->toContain($user->name);
 });
 ```
 
@@ -89,6 +145,21 @@ test('user creation fails with invalid email', function () {
 test('some test', function () {
     $user = new User();
     $user->getName(); // No assertions!
+});
+
+// ❌ BAD - Repeating setup code in every test (should be in Pest.php)
+test('user test 1', function () {
+    $app = new Application();
+    $app->bootstrap();
+    $user = User::create(['name' => 'Test', 'email' => 'test@example.com']);
+    // ... test code
+});
+
+test('user test 2', function () {
+    $app = new Application(); // Repeated setup!
+    $app->bootstrap();
+    $user = User::create(['name' => 'Test', 'email' => 'test@example.com']); // Repeated!
+    // ... test code
 });
 
 // ❌ BAD - Skipped or incomplete tests
@@ -106,8 +177,8 @@ test('todo: write this test', function () {
 
 ## CURRENT STATUS:
 
-- Current coverage: 67.5%
-- Target milestone: 75%
+- Current coverage: 75.6%
+- Target milestone: 85%
 - Framework: Kasi (Laravel Lumen fork)
 - Test runner: Pest PHP
 - Coverage command: `composer test:coverage`
