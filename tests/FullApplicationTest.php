@@ -40,6 +40,12 @@ class FullApplicationTest extends TestCase
     // Restore error handlers to prevent warnings
     restore_error_handler();
     restore_exception_handler();
+
+    // Reset the static aliases registered flag to allow fresh alias registration in each test
+    $reflection = new \ReflectionClass(Application::class);
+    $property = $reflection->getProperty('aliasesRegistered');
+    $property->setAccessible(true);
+    $property->setValue(null, false);
   }
 
   public function testBasicRequest(): void
@@ -614,6 +620,7 @@ class FullApplicationTest extends TestCase
 
     $application->withFacades(true, $aliases);
 
+    // The alias should be created and the class should exist
     $this->assertTrue(class_exists('Foo'));
   }
 

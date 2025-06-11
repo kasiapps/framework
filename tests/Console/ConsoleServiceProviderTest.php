@@ -5,6 +5,12 @@ declare(strict_types=1);
 use Laravel\Lumen\Application;
 use Laravel\Lumen\Console\ConsoleServiceProvider;
 
+afterEach(function () {
+    // Restore error handlers to prevent warnings
+    restore_error_handler();
+    restore_exception_handler();
+});
+
 it('registers console service provider', function () {
   $app = new Application();
   $provider = new ConsoleServiceProvider($app);
