@@ -79,3 +79,65 @@ it('handles stream deferred callback', function () {
 
   expect($streamedResponse->getContent())->toBeFalse();
 });
+
+it('creates response with custom status and headers', function () {
+  $responseFactory = new ResponseFactory;
+  $response = $responseFactory->make('content', 201, ['X-Custom' => 'value']);
+
+  expect($response->getStatusCode())->toBe(201);
+  expect($response->headers->get('X-Custom'))->toBe('value');
+});
+
+it('creates json response with custom status and headers', function () {
+  $responseFactory = new ResponseFactory;
+  $response = $responseFactory->json(['key' => 'value'], 202, ['X-Json' => 'test']);
+
+  expect($response->getStatusCode())->toBe(202);
+  expect($response->headers->get('X-Json'))->toBe('test');
+  expect($response->headers->get('Content-Type'))->toContain('application/json');
+});
+
+it('creates jsonp response', function () {
+  $responseFactory = new ResponseFactory;
+  $response = $responseFactory->jsonp('callback', ['key' => 'value']);
+
+  expect($response)->toBeInstanceOf(SymfonyResponse::class);
+  expect($response->getContent())->toContain('callback({"key":"value"})');
+});
+
+it('creates stream download response', function () {
+  $responseFactory = new ResponseFactory;
+  $response = $responseFactory->streamDownload(function () {
+    echo 'test content';
+  }, 'test.txt');
+
+  expect($response)->toBeInstanceOf(SymfonyResponse::class);
+  expect($response->headers->get('Content-Disposition'))->toContain('attachment');
+  expect($response->headers->get('Content-Disposition'))->toContain('test.txt');
+});
+
+it('creates file response', function () {
+  $temp = tempnam(sys_get_temp_dir(), 'fixture');
+  file_put_contents($temp, 'test content');
+
+  $responseFactory = new ResponseFactory;
+  $response = $responseFactory->file($temp);
+
+  expect($response)->toBeInstanceOf(SymfonyResponse::class);
+  expect($response->getStatusCode())->toBe(200);
+
+  unlink($temp);
+});
+
+it('creates download with custom name', function () {
+  $temp = tempnam(sys_get_temp_dir(), 'fixture');
+  file_put_contents($temp, 'test content');
+
+  $responseFactory = new ResponseFactory;
+  $response = $responseFactory->download($temp, 'custom-name.txt');
+
+  expect($response)->toBeInstanceOf(SymfonyResponse::class);
+  expect($response->headers->get('Content-Disposition'))->toContain('custom-name.txt');
+
+  unlink($temp);
+});

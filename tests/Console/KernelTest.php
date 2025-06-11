@@ -15,3 +15,19 @@ it('has reroute symfony command events method', function () {
   // Test that the method returns static (fluent interface)
   expect($reflection->getReturnType()?->getName())->toBe('static');
 });
+
+it('creates kernel instance', function () {
+  $kernel = new ConsoleKernel(app(), app('events'));
+
+  expect($kernel)->toBeInstanceOf(ConsoleKernel::class);
+});
+
+it('has schedule method', function () {
+  expect(method_exists(ConsoleKernel::class, 'schedule'))->toBeTrue();
+});
+
+it('is instance of console kernel', function () {
+  $kernel = new ConsoleKernel(app(), app('events'));
+
+  expect($kernel)->toBeInstanceOf(ConsoleKernel::class);
+});

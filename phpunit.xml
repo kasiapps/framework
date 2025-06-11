@@ -18,6 +18,13 @@
 		<include>
 			<directory suffix=".php">./src</directory>
 		</include>
+		<exclude>
+			<file>./src/helpers.php</file>
+		</exclude>
 	</source>
-	<coverage></coverage>
+	<coverage>
+		<report>
+			<clover outputFile="clover.xml"/>
+		</report>
+	</coverage>
 </phpunit>
