@@ -1,0 +1,56 @@
+name: 'Framework Subsplit'
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+  release:
+    types: [published]
+  workflow_call:
+    inputs:
+      released:
+        description: 'Whether a release was created'
+        required: false
+        type: string
+        default: 'false'
+      version:
+        description: 'Version tag that was released'
+        required: false
+        type: string
+        default: ''
+
+jobs:
+  split:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run split script
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Check if this was called from main workflow with release info
+          if [[ "${{ inputs.released }}" == "true" && -n "${{ inputs.version }}" ]]; then
+            echo "Release detected from main workflow: ${{ inputs.version }}"
+            echo "Running release script for tag splitting and tagging"
+            bash ./bin/release.sh "${{ inputs.version }}"
+          # Check if this is a direct tag push
+          elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            TAG_NAME=${GITHUB_REF#refs/tags/}
+            echo "Tag push detected: $TAG_NAME"
+            echo "Running release script for tag splitting and tagging"
+            bash ./bin/release.sh $TAG_NAME
+          # Otherwise it's a branch push
+          else
+            BRANCH_NAME=${GITHUB_REF#refs/heads/}
+            echo "Branch push detected: $BRANCH_NAME"
+            echo "Running split script for branch splitting"
+            bash ./bin/split.sh
+          fi

@@ -1,9 +1,9 @@
-# Kasi Queue
+# Kasi Redis
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/kasi/queue.svg?style=flat)](https://packagist.org/packages/kasi/queue)
-[![Total Downloads](https://img.shields.io/packagist/dt/kasi/queue.svg?style=flat)](https://packagist.org/packages/kasi/queue)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/kasi/redis.svg?style=flat)](https://packagist.org/packages/kasi/redis)
+[![Total Downloads](https://img.shields.io/packagist/dt/kasi/redis.svg?style=flat)](https://packagist.org/packages/kasi/redis)
 
-The Kasi Queue component provides a unified API for background job processing in PHP applications. This component allows you to defer time-consuming tasks to background workers, dramatically improving application response times and user experience.
+The Kasi Redis component provides a robust Redis integration for PHP applications. This component offers connection management, clustering support, and comprehensive Redis functionality with both PhpRedis and Predis drivers.
 
 ## ⚠️ Read-Only Repository
 
@@ -24,19 +24,19 @@ For contributions, bug reports, feature requests, and discussions, please visit 
 You can install the component via Composer:
 
 ```bash
-composer require kasi/queue
+composer require kasi/redis
 ```
 
 ## 🚀 Features
 
-- **Multiple Drivers**: Database, Redis, Beanstalkd, Amazon SQS, and synchronous drivers
-- **Job Processing**: Robust background job processing with retry mechanisms
-- **Failed Job Handling**: Comprehensive failed job tracking and retry functionality
-- **Queue Workers**: Efficient long-running worker processes with memory management
-- **Job Batching**: Group related jobs together and track collective progress
-- **Delayed Jobs**: Schedule jobs to run at specific times or after delays
-- **Job Middleware**: Process jobs through middleware pipelines
-- **Rate Limiting**: Control job processing rates and prevent system overload
+- **Multiple Drivers**: Support for both PhpRedis and Predis drivers
+- **Connection Management**: Robust connection pooling and management
+- **Cluster Support**: Redis Cluster support for high availability
+- **Sentinel Support**: Redis Sentinel integration for automatic failover
+- **Rate Limiting**: Built-in rate limiting functionality
+- **Pipeline Support**: Efficient command pipelining
+- **Pub/Sub**: Redis publish/subscribe messaging
+- **Lua Scripting**: Execute Lua scripts on Redis server
 
 ## 📖 Documentation
 
@@ -64,13 +64,13 @@ If you discover any bugs or issues, please report them in the main repository:
 
 ## 📄 License
 
-The Kasi Queue component is open-sourced software licensed under the [MIT license](LICENSE.md).
+The Kasi Redis component is open-sourced software licensed under the [MIT license](LICENSE.md).
 
 ## 🏢 About
 
-Kasi Queue is developed and maintained by [Jetstream Labs](https://jetstreamlabs.com) as part of the Kasi Framework.
+Kasi Redis is developed and maintained by [Jetstream Labs](https://jetstreamlabs.com) as part of the Kasi Framework.
 
-This component is a port of [illuminate/queue](https://github.com/illuminate/queue), originally created by [Taylor Otwell](https://github.com/taylorotwell) and The Laravel Team.
+This component is a port of [illuminate/redis](https://github.com/illuminate/redis), originally created by [Taylor Otwell](https://github.com/taylorotwell) and The Laravel Team.
 
 ---
 

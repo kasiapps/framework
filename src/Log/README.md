@@ -1,9 +1,9 @@
-# Kasi Queue
+# Kasi Log
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/kasi/queue.svg?style=flat)](https://packagist.org/packages/kasi/queue)
-[![Total Downloads](https://img.shields.io/packagist/dt/kasi/queue.svg?style=flat)](https://packagist.org/packages/kasi/queue)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/kasi/log.svg?style=flat)](https://packagist.org/packages/kasi/log)
+[![Total Downloads](https://img.shields.io/packagist/dt/kasi/log.svg?style=flat)](https://packagist.org/packages/kasi/log)
 
-The Kasi Queue component provides a unified API for background job processing in PHP applications. This component allows you to defer time-consuming tasks to background workers, dramatically improving application response times and user experience.
+The Kasi Log component provides a powerful logging system for PHP applications. This component offers multiple logging channels, drivers, and formatters with PSR-3 compliance and extensive configuration options.
 
 ## ⚠️ Read-Only Repository
 
@@ -24,19 +24,19 @@ For contributions, bug reports, feature requests, and discussions, please visit 
 You can install the component via Composer:
 
 ```bash
-composer require kasi/queue
+composer require kasi/log
 ```
 
 ## 🚀 Features
 
-- **Multiple Drivers**: Database, Redis, Beanstalkd, Amazon SQS, and synchronous drivers
-- **Job Processing**: Robust background job processing with retry mechanisms
-- **Failed Job Handling**: Comprehensive failed job tracking and retry functionality
-- **Queue Workers**: Efficient long-running worker processes with memory management
-- **Job Batching**: Group related jobs together and track collective progress
-- **Delayed Jobs**: Schedule jobs to run at specific times or after delays
-- **Job Middleware**: Process jobs through middleware pipelines
-- **Rate Limiting**: Control job processing rates and prevent system overload
+- **Multiple Channels**: Support for single, daily, syslog, errorlog, and custom channels
+- **PSR-3 Compliance**: Full PSR-3 logger interface compliance
+- **Monolog Integration**: Built on top of the powerful Monolog library
+- **Context Support**: Rich context data support for detailed logging
+- **Log Levels**: Support for all standard log levels (emergency, alert, critical, etc.)
+- **Custom Formatters**: Flexible log formatting with custom formatters
+- **Stack Channels**: Combine multiple channels into a single logging stack
+- **Performance Optimization**: Efficient logging with minimal performance impact
 
 ## 📖 Documentation
 
@@ -64,13 +64,13 @@ If you discover any bugs or issues, please report them in the main repository:
 
 ## 📄 License
 
-The Kasi Queue component is open-sourced software licensed under the [MIT license](LICENSE.md).
+The Kasi Log component is open-sourced software licensed under the [MIT license](LICENSE.md).
 
 ## 🏢 About
 
-Kasi Queue is developed and maintained by [Jetstream Labs](https://jetstreamlabs.com) as part of the Kasi Framework.
+Kasi Log is developed and maintained by [Jetstream Labs](https://jetstreamlabs.com) as part of the Kasi Framework.
 
-This component is a port of [illuminate/queue](https://github.com/illuminate/queue), originally created by [Taylor Otwell](https://github.com/taylorotwell) and The Laravel Team.
+This component is a port of [illuminate/log](https://github.com/illuminate/log), originally created by [Taylor Otwell](https://github.com/taylorotwell) and The Laravel Team.
 
 ---
 

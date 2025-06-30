@@ -1,9 +1,9 @@
-# Kasi Queue
+# Kasi Auth
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/kasi/queue.svg?style=flat)](https://packagist.org/packages/kasi/queue)
-[![Total Downloads](https://img.shields.io/packagist/dt/kasi/queue.svg?style=flat)](https://packagist.org/packages/kasi/queue)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/kasi/auth.svg?style=flat)](https://packagist.org/packages/kasi/auth)
+[![Total Downloads](https://img.shields.io/packagist/dt/kasi/auth.svg?style=flat)](https://packagist.org/packages/kasi/auth)
 
-The Kasi Queue component provides a unified API for background job processing in PHP applications. This component allows you to defer time-consuming tasks to background workers, dramatically improving application response times and user experience.
+The Kasi Auth component provides a comprehensive authentication and authorization system for PHP applications. This component includes user authentication, password management, access control, and various authentication guards and middleware.
 
 ## ⚠️ Read-Only Repository
 
@@ -24,19 +24,18 @@ For contributions, bug reports, feature requests, and discussions, please visit 
 You can install the component via Composer:
 
 ```bash
-composer require kasi/queue
+composer require kasi/auth
 ```
 
 ## 🚀 Features
 
-- **Multiple Drivers**: Database, Redis, Beanstalkd, Amazon SQS, and synchronous drivers
-- **Job Processing**: Robust background job processing with retry mechanisms
-- **Failed Job Handling**: Comprehensive failed job tracking and retry functionality
-- **Queue Workers**: Efficient long-running worker processes with memory management
-- **Job Batching**: Group related jobs together and track collective progress
-- **Delayed Jobs**: Schedule jobs to run at specific times or after delays
-- **Job Middleware**: Process jobs through middleware pipelines
-- **Rate Limiting**: Control job processing rates and prevent system overload
+- **Authentication Guards**: Session-based, token-based, and request guards
+- **User Providers**: Database and Eloquent user providers
+- **Password Management**: Password reset and verification functionality
+- **Access Control**: Gate-based authorization system
+- **Middleware**: Authentication and authorization middleware
+- **Events**: Comprehensive authentication event system
+- **Notifications**: Built-in password reset and email verification notifications
 
 ## 📖 Documentation
 
@@ -64,13 +63,13 @@ If you discover any bugs or issues, please report them in the main repository:
 
 ## 📄 License
 
-The Kasi Queue component is open-sourced software licensed under the [MIT license](LICENSE.md).
+The Kasi Auth component is open-sourced software licensed under the [MIT license](LICENSE.md).
 
 ## 🏢 About
 
-Kasi Queue is developed and maintained by [Jetstream Labs](https://jetstreamlabs.com) as part of the Kasi Framework.
+Kasi Auth is developed and maintained by [Jetstream Labs](https://jetstreamlabs.com) as part of the Kasi Framework.
 
-This component is a port of [illuminate/queue](https://github.com/illuminate/queue), originally created by [Taylor Otwell](https://github.com/taylorotwell) and The Laravel Team.
+This component is a port of [illuminate/auth](https://github.com/illuminate/auth), originally created by [Taylor Otwell](https://github.com/taylorotwell) and The Laravel Team.
 
 ---
 

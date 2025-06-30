@@ -1,9 +1,9 @@
-# Kasi Queue
+# Kasi Cache
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/kasi/queue.svg?style=flat)](https://packagist.org/packages/kasi/queue)
-[![Total Downloads](https://img.shields.io/packagist/dt/kasi/queue.svg?style=flat)](https://packagist.org/packages/kasi/queue)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/kasi/cache.svg?style=flat)](https://packagist.org/packages/kasi/cache)
+[![Total Downloads](https://img.shields.io/packagist/dt/kasi/cache.svg?style=flat)](https://packagist.org/packages/kasi/cache)
 
-The Kasi Queue component provides a unified API for background job processing in PHP applications. This component allows you to defer time-consuming tasks to background workers, dramatically improving application response times and user experience.
+The Kasi Cache component provides a unified caching API for PHP applications. This component supports multiple cache stores and offers features like tagging, locking, and rate limiting with a clean and expressive interface.
 
 ## ⚠️ Read-Only Repository
 
@@ -24,19 +24,19 @@ For contributions, bug reports, feature requests, and discussions, please visit 
 You can install the component via Composer:
 
 ```bash
-composer require kasi/queue
+composer require kasi/cache
 ```
 
 ## 🚀 Features
 
-- **Multiple Drivers**: Database, Redis, Beanstalkd, Amazon SQS, and synchronous drivers
-- **Job Processing**: Robust background job processing with retry mechanisms
-- **Failed Job Handling**: Comprehensive failed job tracking and retry functionality
-- **Queue Workers**: Efficient long-running worker processes with memory management
-- **Job Batching**: Group related jobs together and track collective progress
-- **Delayed Jobs**: Schedule jobs to run at specific times or after delays
-- **Job Middleware**: Process jobs through middleware pipelines
-- **Rate Limiting**: Control job processing rates and prevent system overload
+- **Multiple Stores**: Redis, Memcached, Database, File, Array, APC, DynamoDB, and Null stores
+- **Cache Tagging**: Group related cache items and invalidate them together
+- **Cache Locking**: Prevent cache stampedes with distributed locks
+- **Rate Limiting**: Built-in rate limiting functionality
+- **Event System**: Comprehensive cache events for monitoring and debugging
+- **PSR-6 & PSR-16**: Full PSR compliance for cache interfaces
+- **Flexible TTL**: Support for various time formats and expiration strategies
+- **Atomic Operations**: Increment, decrement, and remember operations
 
 ## 📖 Documentation
 
@@ -64,13 +64,13 @@ If you discover any bugs or issues, please report them in the main repository:
 
 ## 📄 License
 
-The Kasi Queue component is open-sourced software licensed under the [MIT license](LICENSE.md).
+The Kasi Cache component is open-sourced software licensed under the [MIT license](LICENSE.md).
 
 ## 🏢 About
 
-Kasi Queue is developed and maintained by [Jetstream Labs](https://jetstreamlabs.com) as part of the Kasi Framework.
+Kasi Cache is developed and maintained by [Jetstream Labs](https://jetstreamlabs.com) as part of the Kasi Framework.
 
-This component is a port of [illuminate/queue](https://github.com/illuminate/queue), originally created by [Taylor Otwell](https://github.com/taylorotwell) and The Laravel Team.
+This component is a port of [illuminate/cache](https://github.com/illuminate/cache), originally created by [Taylor Otwell](https://github.com/taylorotwell) and The Laravel Team.
 
 ---
 

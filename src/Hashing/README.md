@@ -1,9 +1,9 @@
-# Kasi Queue
+# Kasi Hashing
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/kasi/queue.svg?style=flat)](https://packagist.org/packages/kasi/queue)
-[![Total Downloads](https://img.shields.io/packagist/dt/kasi/queue.svg?style=flat)](https://packagist.org/packages/kasi/queue)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/kasi/hashing.svg?style=flat)](https://packagist.org/packages/kasi/hashing)
+[![Total Downloads](https://img.shields.io/packagist/dt/kasi/hashing.svg?style=flat)](https://packagist.org/packages/kasi/hashing)
 
-The Kasi Queue component provides a unified API for background job processing in PHP applications. This component allows you to defer time-consuming tasks to background workers, dramatically improving application response times and user experience.
+The Kasi Hashing component provides secure password hashing services for PHP applications. This component offers multiple hashing algorithms including Bcrypt, Argon2i, and Argon2id with configurable security parameters.
 
 ## ⚠️ Read-Only Repository
 
@@ -24,19 +24,19 @@ For contributions, bug reports, feature requests, and discussions, please visit 
 You can install the component via Composer:
 
 ```bash
-composer require kasi/queue
+composer require kasi/hashing
 ```
 
 ## 🚀 Features
 
-- **Multiple Drivers**: Database, Redis, Beanstalkd, Amazon SQS, and synchronous drivers
-- **Job Processing**: Robust background job processing with retry mechanisms
-- **Failed Job Handling**: Comprehensive failed job tracking and retry functionality
-- **Queue Workers**: Efficient long-running worker processes with memory management
-- **Job Batching**: Group related jobs together and track collective progress
-- **Delayed Jobs**: Schedule jobs to run at specific times or after delays
-- **Job Middleware**: Process jobs through middleware pipelines
-- **Rate Limiting**: Control job processing rates and prevent system overload
+- **Multiple Algorithms**: Support for Bcrypt, Argon2i, and Argon2id hashing algorithms
+- **Configurable Security**: Adjustable cost factors and security parameters
+- **Password Verification**: Secure password verification with timing attack protection
+- **Hash Information**: Extract algorithm and parameter information from hashes
+- **Rehashing Detection**: Detect when passwords need to be rehashed due to parameter changes
+- **Driver Management**: Pluggable driver system for different hashing algorithms
+- **Security Best Practices**: Implementation follows current security recommendations
+- **Performance Optimization**: Balanced security and performance considerations
 
 ## 📖 Documentation
 
@@ -64,13 +64,13 @@ If you discover any bugs or issues, please report them in the main repository:
 
 ## 📄 License
 
-The Kasi Queue component is open-sourced software licensed under the [MIT license](LICENSE.md).
+The Kasi Hashing component is open-sourced software licensed under the [MIT license](LICENSE.md).
 
 ## 🏢 About
 
-Kasi Queue is developed and maintained by [Jetstream Labs](https://jetstreamlabs.com) as part of the Kasi Framework.
+Kasi Hashing is developed and maintained by [Jetstream Labs](https://jetstreamlabs.com) as part of the Kasi Framework.
 
-This component is a port of [illuminate/queue](https://github.com/illuminate/queue), originally created by [Taylor Otwell](https://github.com/taylorotwell) and The Laravel Team.
+This component is a port of [illuminate/hashing](https://github.com/illuminate/hashing), originally created by [Taylor Otwell](https://github.com/taylorotwell) and The Laravel Team.
 
 ---
 

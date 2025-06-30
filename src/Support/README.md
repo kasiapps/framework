@@ -1,9 +1,9 @@
-# Kasi Queue
+# Kasi Support
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/kasi/queue.svg?style=flat)](https://packagist.org/packages/kasi/queue)
-[![Total Downloads](https://img.shields.io/packagist/dt/kasi/queue.svg?style=flat)](https://packagist.org/packages/kasi/queue)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/kasi/support.svg?style=flat)](https://packagist.org/packages/kasi/support)
+[![Total Downloads](https://img.shields.io/packagist/dt/kasi/support.svg?style=flat)](https://packagist.org/packages/kasi/support)
 
-The Kasi Queue component provides a unified API for background job processing in PHP applications. This component allows you to defer time-consuming tasks to background workers, dramatically improving application response times and user experience.
+The Kasi Support component provides a collection of utility classes and helper functions for PHP applications. This component includes string manipulation, array utilities, service providers, facades, and many other essential tools.
 
 ## ⚠️ Read-Only Repository
 
@@ -24,19 +24,19 @@ For contributions, bug reports, feature requests, and discussions, please visit 
 You can install the component via Composer:
 
 ```bash
-composer require kasi/queue
+composer require kasi/support
 ```
 
 ## 🚀 Features
 
-- **Multiple Drivers**: Database, Redis, Beanstalkd, Amazon SQS, and synchronous drivers
-- **Job Processing**: Robust background job processing with retry mechanisms
-- **Failed Job Handling**: Comprehensive failed job tracking and retry functionality
-- **Queue Workers**: Efficient long-running worker processes with memory management
-- **Job Batching**: Group related jobs together and track collective progress
-- **Delayed Jobs**: Schedule jobs to run at specific times or after delays
-- **Job Middleware**: Process jobs through middleware pipelines
-- **Rate Limiting**: Control job processing rates and prevent system overload
+- **String Utilities**: Comprehensive string manipulation with Str and Stringable classes
+- **Array Helpers**: Powerful array manipulation functions via Arr class
+- **Service Providers**: Base service provider class for dependency injection
+- **Facades**: Static proxy pattern implementation for elegant API access
+- **Helper Functions**: Global helper functions for common operations
+- **Carbon Integration**: Enhanced date and time handling with Carbon
+- **Process Utilities**: Process execution and management tools
+- **Benchmarking**: Performance measurement and benchmarking utilities
 
 ## 📖 Documentation
 
@@ -64,13 +64,13 @@ If you discover any bugs or issues, please report them in the main repository:
 
 ## 📄 License
 
-The Kasi Queue component is open-sourced software licensed under the [MIT license](LICENSE.md).
+The Kasi Support component is open-sourced software licensed under the [MIT license](LICENSE.md).
 
 ## 🏢 About
 
-Kasi Queue is developed and maintained by [Jetstream Labs](https://jetstreamlabs.com) as part of the Kasi Framework.
+Kasi Support is developed and maintained by [Jetstream Labs](https://jetstreamlabs.com) as part of the Kasi Framework.
 
-This component is a port of [illuminate/queue](https://github.com/illuminate/queue), originally created by [Taylor Otwell](https://github.com/taylorotwell) and The Laravel Team.
+This component is a port of [illuminate/support](https://github.com/illuminate/support), originally created by [Taylor Otwell](https://github.com/taylorotwell) and The Laravel Team.
 
 ---
 

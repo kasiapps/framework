@@ -1,9 +1,9 @@
-# Kasi Queue
+# Kasi Contracts
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/kasi/queue.svg?style=flat)](https://packagist.org/packages/kasi/queue)
-[![Total Downloads](https://img.shields.io/packagist/dt/kasi/queue.svg?style=flat)](https://packagist.org/packages/kasi/queue)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/kasi/contracts.svg?style=flat)](https://packagist.org/packages/kasi/contracts)
+[![Total Downloads](https://img.shields.io/packagist/dt/kasi/contracts.svg?style=flat)](https://packagist.org/packages/kasi/contracts)
 
-The Kasi Queue component provides a unified API for background job processing in PHP applications. This component allows you to defer time-consuming tasks to background workers, dramatically improving application response times and user experience.
+The Kasi Contracts component provides a set of interfaces that define the contracts for various framework components. These interfaces ensure consistent APIs across the framework and enable loose coupling between components.
 
 ## ⚠️ Read-Only Repository
 
@@ -24,19 +24,19 @@ For contributions, bug reports, feature requests, and discussions, please visit 
 You can install the component via Composer:
 
 ```bash
-composer require kasi/queue
+composer require kasi/contracts
 ```
 
 ## 🚀 Features
 
-- **Multiple Drivers**: Database, Redis, Beanstalkd, Amazon SQS, and synchronous drivers
-- **Job Processing**: Robust background job processing with retry mechanisms
-- **Failed Job Handling**: Comprehensive failed job tracking and retry functionality
-- **Queue Workers**: Efficient long-running worker processes with memory management
-- **Job Batching**: Group related jobs together and track collective progress
-- **Delayed Jobs**: Schedule jobs to run at specific times or after delays
-- **Job Middleware**: Process jobs through middleware pipelines
-- **Rate Limiting**: Control job processing rates and prevent system overload
+- **Framework Interfaces**: Complete set of interfaces for all framework components
+- **Loose Coupling**: Enable dependency injection and interface-based programming
+- **Consistent APIs**: Standardized method signatures across implementations
+- **PSR Compliance**: Includes PSR-compliant interfaces where applicable
+- **Extensibility**: Easy to implement custom components following framework contracts
+- **Type Safety**: Strong typing support for better IDE integration and error detection
+- **Documentation**: Well-documented interfaces with clear method contracts
+- **Backward Compatibility**: Stable interface definitions for long-term compatibility
 
 ## 📖 Documentation
 
@@ -64,13 +64,13 @@ If you discover any bugs or issues, please report them in the main repository:
 
 ## 📄 License
 
-The Kasi Queue component is open-sourced software licensed under the [MIT license](LICENSE.md).
+The Kasi Contracts component is open-sourced software licensed under the [MIT license](LICENSE.md).
 
 ## 🏢 About
 
-Kasi Queue is developed and maintained by [Jetstream Labs](https://jetstreamlabs.com) as part of the Kasi Framework.
+Kasi Contracts is developed and maintained by [Jetstream Labs](https://jetstreamlabs.com) as part of the Kasi Framework.
 
-This component is a port of [illuminate/queue](https://github.com/illuminate/queue), originally created by [Taylor Otwell](https://github.com/taylorotwell) and The Laravel Team.
+This component is a port of [illuminate/contracts](https://github.com/illuminate/contracts), originally created by [Taylor Otwell](https://github.com/taylorotwell) and The Laravel Team.
 
 ---
 

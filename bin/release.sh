@@ -6,71 +6,87 @@ set -e
 if (( "$#" != 1 ))
 then
     echo "Tag has to be provided."
-
     exit 1
 fi
 
-RELEASE_BRANCH="11.x"
-CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 VERSION=$1
 
-# Make sure current branch and release branch match.
-if [[ "$RELEASE_BRANCH" != "$CURRENT_BRANCH" ]]
-then
-    echo "Release branch ($RELEASE_BRANCH) does not match the current active branch ($CURRENT_BRANCH)."
-
-    exit 1
-fi
-
-# Make sure the working directory is clear.
-if [[ ! -z "$(git status --porcelain)" ]]
-then
-    echo "Your working directory is dirty. Did you forget to commit your changes?"
-
-    exit 1
-fi
-
-# Make sure latest changes are fetched first.
-git fetch origin
-
-# Make sure that release branch is in sync with origin.
-if [[ $(git rev-parse HEAD) != $(git rev-parse origin/$RELEASE_BRANCH) ]]
-then
-    echo "Your branch is out of date with its upstream. Did you forget to pull or push any changes before releasing?"
-
-    exit 1
-fi
-
-# Always prepend with "v"
-if [[ $VERSION != v*  ]]
+# Always prepend with "v" if not already present
+if [[ $VERSION != v* ]]
 then
     VERSION="v$VERSION"
 fi
 
-# Tag Framework
-git tag $VERSION
-git push origin --tags
+echo "Processing release for tag: $VERSION"
 
-# Tag Components
-for REMOTE in auth broadcasting bus cache collections conditionable config console container contracts cookie database encryption events filesystem hashing http log macroable mail notifications pagination pipeline process queue redis routing session support testing translation validation view
+# Configure git for CI environment - use commit author info
+git config --global user.email "$(git log -1 --pretty=format:'%ae')"
+git config --global user.name "$(git log -1 --pretty=format:'%an')"
+
+# Split and tag components
+declare -A COMPONENTS=(
+    ["auth"]="src/Auth"
+    ["broadcasting"]="src/Broadcasting"
+    ["bus"]="src/Bus"
+    ["cache"]="src/Cache"
+    ["collections"]="src/Collections"
+    ["conditionable"]="src/Conditionable"
+    ["config"]="src/Config"
+    ["console"]="src/Console"
+    ["container"]="src/Container"
+    ["contracts"]="src/Contracts"
+    ["database"]="src/Database"
+    ["encryption"]="src/Encryption"
+    ["events"]="src/Events"
+    ["filesystem"]="src/Filesystem"
+    ["hashing"]="src/Hashing"
+    ["http"]="src/Http"
+    ["log"]="src/Log"
+    ["macroable"]="src/Macroable"
+    ["pagination"]="src/Pagination"
+    ["pipeline"]="src/Pipeline"
+    ["prompts"]="src/Prompts"
+    ["queue"]="src/Queue"
+    ["redis"]="src/Redis"
+    ["serializable-closure"]="src/SerializableClosure"
+    ["session"]="src/Session"
+    ["support"]="src/Support"
+    ["testing"]="src/Testing"
+    ["tinker"]="src/Tinker"
+    ["translation"]="src/Translation"
+    ["validation"]="src/Validation"
+    ["view"]="src/View"
+)
+
+for REMOTE in "${!COMPONENTS[@]}"
 do
+    COMPONENT_PATH="${COMPONENTS[$REMOTE]}"
+
     echo ""
-    echo ""
-    echo "Releasing $REMOTE";
+    echo "Splitting and tagging $REMOTE from $COMPONENT_PATH"
 
-    TMP_DIR="/tmp/laravel-split"
-    REMOTE_URL="git@github.com:illuminate/$REMOTE.git"
+    # Check if component path exists
+    if [ ! -d "$COMPONENT_PATH" ]; then
+        echo "Warning: $COMPONENT_PATH does not exist, skipping $REMOTE"
+        continue
+    fi
 
-    rm -rf $TMP_DIR;
-    mkdir $TMP_DIR;
+    # Create the split using splitsh-lite
+    SHA1=$(./bin/splitsh-lite --prefix="$COMPONENT_PATH")
 
-    (
-        cd $TMP_DIR;
+    if [ -z "$SHA1" ]; then
+        echo "Warning: No commits found for $COMPONENT_PATH, skipping $REMOTE"
+        continue
+    fi
 
-        git clone $REMOTE_URL .
-        git checkout "$RELEASE_BRANCH";
+    echo "Split SHA1 for $REMOTE: $SHA1"
 
-        git tag $VERSION
-        git push origin --tags
-    )
+    # Push the tag to the component repository
+    REMOTE_URL="https://${GITHUB_TOKEN}@github.com/$REMOTE.git"
+    git push "$REMOTE_URL" "$SHA1:refs/tags/$VERSION"
+
+    echo "Successfully tagged $REMOTE with $VERSION"
 done
+
+echo ""
+echo "Release $VERSION completed successfully!"

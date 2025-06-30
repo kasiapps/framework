@@ -3,85 +3,152 @@
 set -e
 set -x
 
-CURRENT_BRANCH="11.x"
+# Default branch
+CURRENT_BRANCH="main"
+TAG=""
+
+# Check if a tag is provided as first argument
+if [ "$#" -eq 1 ]; then
+    TAG="$1"
+    echo "Splitting for tag: $TAG"
+else
+    echo "Splitting for branch: $CURRENT_BRANCH"
+fi
 
 function split()
 {
-    SHA1=`./bin/splitsh-lite --prefix=$1`
-    git push $2 "$SHA1:refs/heads/$CURRENT_BRANCH" -f
+    local PREFIX=$1
+    local REMOTE_NAME=$2
+    local REMOTE_URL=$3
+
+    echo "Splitting $PREFIX to $REMOTE_NAME"
+
+    # Check if path exists
+    if [ ! -d "$PREFIX" ]; then
+        echo "Warning: $PREFIX does not exist, skipping $REMOTE_NAME"
+        return
+    fi
+
+    # Create the split
+    SHA1=$(./bin/splitsh-lite --prefix="$PREFIX")
+
+    if [ -z "$SHA1" ]; then
+        echo "Warning: No commits found for $PREFIX, skipping $REMOTE_NAME"
+        return
+    fi
+
+    echo "Split SHA1 for $REMOTE_NAME: $SHA1"
+
+    # Configure git for CI if needed - use commit author info
+    git config --global user.email "$(git log -1 --pretty=format:'%ae')" 2>/dev/null || true
+    git config --global user.name "$(git log -1 --pretty=format:'%an')" 2>/dev/null || true
+
+    # Push either tag or branch
+    if [ -n "$TAG" ]; then
+        echo "Pushing tag $TAG to $REMOTE_NAME"
+        git push "$REMOTE_URL" "$SHA1:refs/tags/$TAG"
+    else
+        echo "Pushing branch $CURRENT_BRANCH to $REMOTE_NAME"
+        git push "$REMOTE_URL" "$SHA1:refs/heads/$CURRENT_BRANCH" -f
+    fi
 }
 
 function remote()
 {
-    git remote add $1 $2 || true
+    git remote add $1 $2 2>/dev/null || true
 }
 
-git pull origin $CURRENT_BRANCH
+# Only pull if we're doing branch operations (not tags)
+if [ -z "$TAG" ]; then
+    git pull origin $CURRENT_BRANCH
+fi
 
-remote auth git@github.com:illuminate/auth.git
-remote broadcasting git@github.com:illuminate/broadcasting.git
-remote bus git@github.com:illuminate/bus.git
-remote cache git@github.com:illuminate/cache.git
-remote collections git@github.com:illuminate/collections.git
-remote conditionable git@github.com:illuminate/conditionable.git
-remote config git@github.com:illuminate/config.git
-remote console git@github.com:illuminate/console.git
-remote container git@github.com:illuminate/container.git
-remote contracts git@github.com:illuminate/contracts.git
-remote cookie git@github.com:illuminate/cookie.git
-remote database git@github.com:illuminate/database.git
-remote encryption git@github.com:illuminate/encryption.git
-remote events git@github.com:illuminate/events.git
-remote filesystem git@github.com:illuminate/filesystem.git
-remote hashing git@github.com:illuminate/hashing.git
-remote http git@github.com:illuminate/http.git
-remote log git@github.com:illuminate/log.git
-remote macroable git@github.com:illuminate/macroable.git
-remote mail git@github.com:illuminate/mail.git
-remote notifications git@github.com:illuminate/notifications.git
-remote pagination git@github.com:illuminate/pagination.git
-remote pipeline git@github.com:illuminate/pipeline.git
-remote process git@github.com:illuminate/process.git
-remote queue git@github.com:illuminate/queue.git
-remote redis git@github.com:illuminate/redis.git
-remote routing git@github.com:illuminate/routing.git
-remote session git@github.com:illuminate/session.git
-remote support git@github.com:illuminate/support.git
-remote testing git@github.com:illuminate/testing.git
-remote translation git@github.com:illuminate/translation.git
-remote validation git@github.com:illuminate/validation.git
-remote view git@github.com:illuminate/view.git
+# Define components and their remote URLs
+declare -A COMPONENTS=(
+    ["auth"]="git@github.com:kasiapps/auth.git"
+    ["broadcasting"]="git@github.com:kasiapps/broadcasting.git"
+    ["bus"]="git@github.com:kasiapps/bus.git"
+    ["cache"]="git@github.com:kasiapps/cache.git"
+    ["collections"]="git@github.com:kasiapps/collections.git"
+    ["conditionable"]="git@github.com:kasiapps/conditionable.git"
+    ["config"]="git@github.com:kasiapps/config.git"
+    ["console"]="git@github.com:kasiapps/console.git"
+    ["container"]="git@github.com:kasiapps/container.git"
+    ["contracts"]="git@github.com:kasiapps/contracts.git"
+    ["database"]="git@github.com:kasiapps/database.git"
+    ["encryption"]="git@github.com:kasiapps/encryption.git"
+    ["events"]="git@github.com:kasiapps/events.git"
+    ["filesystem"]="git@github.com:kasiapps/filesystem.git"
+    ["hashing"]="git@github.com:kasiapps/hashing.git"
+    ["http"]="git@github.com:kasiapps/http.git"
+    ["log"]="git@github.com:kasiapps/log.git"
+    ["macroable"]="git@github.com:kasiapps/macroable.git"
+    ["pagination"]="git@github.com:kasiapps/pagination.git"
+    ["pipeline"]="git@github.com:kasiapps/pipeline.git"
+    ["prompts"]="git@github.com:kasiapps/prompts.git"
+    ["queue"]="git@github.com:kasiapps/queue.git"
+    ["redis"]="git@github.com:kasiapps/redis.git"
+    ["serializable-closure"]="git@github.com:kasiapps/serializable-closure.git"
+    ["session"]="git@github.com:kasiapps/session.git"
+    ["support"]="git@github.com:kasiapps/support.git"
+    ["testing"]="git@github.com:kasiapps/testing.git"
+    ["tinker"]="git@github.com:kasiapps/tinker.git"
+    ["translation"]="git@github.com:kasiapps/translation.git"
+    ["validation"]="git@github.com:kasiapps/validation.git"
+    ["view"]="git@github.com:kasiapps/view.git"
+)
 
-split 'src/Illuminate/Auth' auth
-split 'src/Illuminate/Broadcasting' broadcasting
-split 'src/Illuminate/Bus' bus
-split 'src/Illuminate/Cache' cache
-split 'src/Illuminate/Collections' collections
-split 'src/Illuminate/Conditionable' conditionable
-split 'src/Illuminate/Config' config
-split 'src/Illuminate/Console' console
-split 'src/Illuminate/Container' container
-split 'src/Illuminate/Contracts' contracts
-split 'src/Illuminate/Cookie' cookie
-split 'src/Illuminate/Database' database
-split 'src/Illuminate/Encryption' encryption
-split 'src/Illuminate/Events' events
-split 'src/Illuminate/Filesystem' filesystem
-split 'src/Illuminate/Hashing' hashing
-split 'src/Illuminate/Http' http
-split 'src/Illuminate/Log' log
-split 'src/Illuminate/Macroable' macroable
-split 'src/Illuminate/Mail' mail
-split 'src/Illuminate/Notifications' notifications
-split 'src/Illuminate/Pagination' pagination
-split 'src/Illuminate/Pipeline' pipeline
-split 'src/Illuminate/Process' process
-split 'src/Illuminate/Queue' queue
-split 'src/Illuminate/Redis' redis
-split 'src/Illuminate/Routing' routing
-split 'src/Illuminate/Session' session
-split 'src/Illuminate/Support' support
-split 'src/Illuminate/Testing' testing
-split 'src/Illuminate/Translation' translation
-split 'src/Illuminate/Validation' validation
-split 'src/Illuminate/View' view
+# Define source paths for each component
+declare -A PATHS=(
+    ["auth"]="src/Auth"
+    ["broadcasting"]="src/Broadcasting"
+    ["bus"]="src/Bus"
+    ["cache"]="src/Cache"
+    ["collections"]="src/Collections"
+    ["conditionable"]="src/Conditionable"
+    ["config"]="src/Config"
+    ["console"]="src/Console"
+    ["container"]="src/Container"
+    ["contracts"]="src/Contracts"
+    ["database"]="src/Database"
+    ["encryption"]="src/Encryption"
+    ["events"]="src/Events"
+    ["filesystem"]="src/Filesystem"
+    ["hashing"]="src/Hashing"
+    ["http"]="src/Http"
+    ["log"]="src/Log"
+    ["macroable"]="src/Macroable"
+    ["pagination"]="src/Pagination"
+    ["pipeline"]="src/Pipeline"
+    ["prompts"]="src/Prompts"
+    ["queue"]="src/Queue"
+    ["redis"]="src/Redis"
+    ["serializable-closure"]="src/SerializableClosure"
+    ["session"]="src/Session"
+    ["support"]="src/Support"
+    ["testing"]="src/Testing"
+    ["tinker"]="src/Tinker"
+    ["translation"]="src/Translation"
+    ["validation"]="src/Validation"
+    ["view"]="src/View"
+)
+
+# Add remotes and split components
+for COMPONENT in "${!COMPONENTS[@]}"
+do
+    REMOTE_URL="${COMPONENTS[$COMPONENT]}"
+    COMPONENT_PATH="${PATHS[$COMPONENT]}"
+
+    # Add remote (ignore errors if already exists)
+    remote "$COMPONENT" "$REMOTE_URL"
+
+    # Split the component
+    split "$COMPONENT_PATH" "$COMPONENT" "$REMOTE_URL"
+done
+
+echo ""
+if [ -n "$TAG" ]; then
+    echo "Tag splitting completed for: $TAG"
+else
+    echo "Branch splitting completed for: $CURRENT_BRANCH"
+fi

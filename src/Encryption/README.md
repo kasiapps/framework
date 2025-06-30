@@ -1,9 +1,9 @@
-# Kasi Queue
+# Kasi Encryption
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/kasi/queue.svg?style=flat)](https://packagist.org/packages/kasi/queue)
-[![Total Downloads](https://img.shields.io/packagist/dt/kasi/queue.svg?style=flat)](https://packagist.org/packages/kasi/queue)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/kasi/encryption.svg?style=flat)](https://packagist.org/packages/kasi/encryption)
+[![Total Downloads](https://img.shields.io/packagist/dt/kasi/encryption.svg?style=flat)](https://packagist.org/packages/kasi/encryption)
 
-The Kasi Queue component provides a unified API for background job processing in PHP applications. This component allows you to defer time-consuming tasks to background workers, dramatically improving application response times and user experience.
+The Kasi Encryption component provides secure encryption and decryption services for PHP applications. This component offers AES encryption with multiple cipher modes and secure key management.
 
 ## ⚠️ Read-Only Repository
 
@@ -24,19 +24,19 @@ For contributions, bug reports, feature requests, and discussions, please visit 
 You can install the component via Composer:
 
 ```bash
-composer require kasi/queue
+composer require kasi/encryption
 ```
 
 ## 🚀 Features
 
-- **Multiple Drivers**: Database, Redis, Beanstalkd, Amazon SQS, and synchronous drivers
-- **Job Processing**: Robust background job processing with retry mechanisms
-- **Failed Job Handling**: Comprehensive failed job tracking and retry functionality
-- **Queue Workers**: Efficient long-running worker processes with memory management
-- **Job Batching**: Group related jobs together and track collective progress
-- **Delayed Jobs**: Schedule jobs to run at specific times or after delays
-- **Job Middleware**: Process jobs through middleware pipelines
-- **Rate Limiting**: Control job processing rates and prevent system overload
+- **AES Encryption**: Industry-standard AES encryption with multiple cipher modes
+- **Secure Key Management**: Automatic key generation and validation
+- **Multiple Ciphers**: Support for AES-128-CBC, AES-256-CBC, and AES-256-GCM
+- **Payload Serialization**: Automatic serialization and unserialization of encrypted data
+- **MAC Verification**: Message Authentication Code for data integrity
+- **Exception Handling**: Comprehensive exception handling for encryption failures
+- **Base64 Encoding**: Safe base64 encoding for encrypted payloads
+- **Key Rotation**: Support for key rotation and migration strategies
 
 ## 📖 Documentation
 
@@ -64,13 +64,13 @@ If you discover any bugs or issues, please report them in the main repository:
 
 ## 📄 License
 
-The Kasi Queue component is open-sourced software licensed under the [MIT license](LICENSE.md).
+The Kasi Encryption component is open-sourced software licensed under the [MIT license](LICENSE.md).
 
 ## 🏢 About
 
-Kasi Queue is developed and maintained by [Jetstream Labs](https://jetstreamlabs.com) as part of the Kasi Framework.
+Kasi Encryption is developed and maintained by [Jetstream Labs](https://jetstreamlabs.com) as part of the Kasi Framework.
 
-This component is a port of [illuminate/queue](https://github.com/illuminate/queue), originally created by [Taylor Otwell](https://github.com/taylorotwell) and The Laravel Team.
+This component is a port of [illuminate/encryption](https://github.com/illuminate/encryption), originally created by [Taylor Otwell](https://github.com/taylorotwell) and The Laravel Team.
 
 ---
 

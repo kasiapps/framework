@@ -1,8 +1,10 @@
 .DS_Store
 /vendor
+/node_modules
 /.vscode
 /phpunit.xml
 /.phpunit.cache
 .phpunit.result.cache
+coverage.md
 bun.lock
 composer.lock

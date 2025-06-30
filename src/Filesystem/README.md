@@ -1,9 +1,9 @@
-# Kasi Queue
+# Kasi Filesystem
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/kasi/queue.svg?style=flat)](https://packagist.org/packages/kasi/queue)
-[![Total Downloads](https://img.shields.io/packagist/dt/kasi/queue.svg?style=flat)](https://packagist.org/packages/kasi/queue)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/kasi/filesystem.svg?style=flat)](https://packagist.org/packages/kasi/filesystem)
+[![Total Downloads](https://img.shields.io/packagist/dt/kasi/filesystem.svg?style=flat)](https://packagist.org/packages/kasi/filesystem)
 
-The Kasi Queue component provides a unified API for background job processing in PHP applications. This component allows you to defer time-consuming tasks to background workers, dramatically improving application response times and user experience.
+The Kasi Filesystem component provides a unified API for working with filesystems in PHP applications. This component supports local filesystems, cloud storage services, and offers a consistent interface across different storage backends.
 
 ## ⚠️ Read-Only Repository
 
@@ -24,19 +24,19 @@ For contributions, bug reports, feature requests, and discussions, please visit 
 You can install the component via Composer:
 
 ```bash
-composer require kasi/queue
+composer require kasi/filesystem
 ```
 
 ## 🚀 Features
 
-- **Multiple Drivers**: Database, Redis, Beanstalkd, Amazon SQS, and synchronous drivers
-- **Job Processing**: Robust background job processing with retry mechanisms
-- **Failed Job Handling**: Comprehensive failed job tracking and retry functionality
-- **Queue Workers**: Efficient long-running worker processes with memory management
-- **Job Batching**: Group related jobs together and track collective progress
-- **Delayed Jobs**: Schedule jobs to run at specific times or after delays
-- **Job Middleware**: Process jobs through middleware pipelines
-- **Rate Limiting**: Control job processing rates and prevent system overload
+- **Multiple Drivers**: Local filesystem, AWS S3, and other cloud storage adapters
+- **Unified API**: Consistent interface across different storage backends
+- **File Operations**: Read, write, copy, move, and delete files and directories
+- **Stream Support**: Handle large files efficiently with streaming operations
+- **Visibility Control**: Manage file and directory visibility (public/private)
+- **Temporary URLs**: Generate temporary URLs for private files
+- **File Locking**: Atomic file operations with locking mechanisms
+- **Path Utilities**: Comprehensive path manipulation and validation utilities
 
 ## 📖 Documentation
 
@@ -64,13 +64,13 @@ If you discover any bugs or issues, please report them in the main repository:
 
 ## 📄 License
 
-The Kasi Queue component is open-sourced software licensed under the [MIT license](LICENSE.md).
+The Kasi Filesystem component is open-sourced software licensed under the [MIT license](LICENSE.md).
 
 ## 🏢 About
 
-Kasi Queue is developed and maintained by [Jetstream Labs](https://jetstreamlabs.com) as part of the Kasi Framework.
+Kasi Filesystem is developed and maintained by [Jetstream Labs](https://jetstreamlabs.com) as part of the Kasi Framework.
 
-This component is a port of [illuminate/queue](https://github.com/illuminate/queue), originally created by [Taylor Otwell](https://github.com/taylorotwell) and The Laravel Team.
+This component is a port of [illuminate/filesystem](https://github.com/illuminate/filesystem), originally created by [Taylor Otwell](https://github.com/taylorotwell) and The Laravel Team.
 
 ---
 

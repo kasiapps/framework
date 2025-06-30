@@ -1,9 +1,9 @@
-# Kasi Queue
+# Kasi Broadcasting
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/kasi/queue.svg?style=flat)](https://packagist.org/packages/kasi/queue)
-[![Total Downloads](https://img.shields.io/packagist/dt/kasi/queue.svg?style=flat)](https://packagist.org/packages/kasi/queue)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/kasi/broadcasting.svg?style=flat)](https://packagist.org/packages/kasi/broadcasting)
+[![Total Downloads](https://img.shields.io/packagist/dt/kasi/broadcasting.svg?style=flat)](https://packagist.org/packages/kasi/broadcasting)
 
-The Kasi Queue component provides a unified API for background job processing in PHP applications. This component allows you to defer time-consuming tasks to background workers, dramatically improving application response times and user experience.
+The Kasi Broadcasting component provides a comprehensive real-time event broadcasting system for PHP applications. This component enables you to broadcast events to various channels and services, supporting WebSocket connections, push notifications, and real-time communication.
 
 ## ⚠️ Read-Only Repository
 
@@ -24,19 +24,19 @@ For contributions, bug reports, feature requests, and discussions, please visit 
 You can install the component via Composer:
 
 ```bash
-composer require kasi/queue
+composer require kasi/broadcasting
 ```
 
 ## 🚀 Features
 
-- **Multiple Drivers**: Database, Redis, Beanstalkd, Amazon SQS, and synchronous drivers
-- **Job Processing**: Robust background job processing with retry mechanisms
-- **Failed Job Handling**: Comprehensive failed job tracking and retry functionality
-- **Queue Workers**: Efficient long-running worker processes with memory management
-- **Job Batching**: Group related jobs together and track collective progress
-- **Delayed Jobs**: Schedule jobs to run at specific times or after delays
-- **Job Middleware**: Process jobs through middleware pipelines
-- **Rate Limiting**: Control job processing rates and prevent system overload
+- **Multiple Broadcasters**: Pusher, Ably, Redis, Log, and Null broadcasters
+- **Channel Types**: Public, private, presence, and encrypted private channels
+- **Event Broadcasting**: Queue-based and real-time event broadcasting
+- **Authentication**: Channel authentication and authorization
+- **Socket Management**: Socket ID tracking and user exclusion
+- **Anonymous Events**: Send events without creating event classes
+- **Unique Broadcasting**: Prevent duplicate broadcasts with unique locks
+- **Middleware Support**: Broadcasting middleware and route handling
 
 ## 📖 Documentation
 
@@ -64,13 +64,13 @@ If you discover any bugs or issues, please report them in the main repository:
 
 ## 📄 License
 
-The Kasi Queue component is open-sourced software licensed under the [MIT license](LICENSE.md).
+The Kasi Broadcasting component is open-sourced software licensed under the [MIT license](LICENSE.md).
 
 ## 🏢 About
 
-Kasi Queue is developed and maintained by [Jetstream Labs](https://jetstreamlabs.com) as part of the Kasi Framework.
+Kasi Broadcasting is developed and maintained by [Jetstream Labs](https://jetstreamlabs.com) as part of the Kasi Framework.
 
-This component is a port of [illuminate/queue](https://github.com/illuminate/queue), originally created by [Taylor Otwell](https://github.com/taylorotwell) and The Laravel Team.
+This component is a port of [illuminate/broadcasting](https://github.com/illuminate/broadcasting), originally created by [Taylor Otwell](https://github.com/taylorotwell) and The Laravel Team.
 
 ---
 

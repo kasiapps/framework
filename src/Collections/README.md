@@ -1,9 +1,9 @@
-# Kasi Queue
+# Kasi Collections
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/kasi/queue.svg?style=flat)](https://packagist.org/packages/kasi/queue)
-[![Total Downloads](https://img.shields.io/packagist/dt/kasi/queue.svg?style=flat)](https://packagist.org/packages/kasi/queue)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/kasi/collections.svg?style=flat)](https://packagist.org/packages/kasi/collections)
+[![Total Downloads](https://img.shields.io/packagist/dt/kasi/collections.svg?style=flat)](https://packagist.org/packages/kasi/collections)
 
-The Kasi Queue component provides a unified API for background job processing in PHP applications. This component allows you to defer time-consuming tasks to background workers, dramatically improving application response times and user experience.
+The Kasi Collections component provides a fluent, convenient wrapper for working with arrays of data. This component offers dozens of methods for manipulating arrays and collections with an expressive, chainable API.
 
 ## ⚠️ Read-Only Repository
 
@@ -24,19 +24,19 @@ For contributions, bug reports, feature requests, and discussions, please visit 
 You can install the component via Composer:
 
 ```bash
-composer require kasi/queue
+composer require kasi/collections
 ```
 
 ## 🚀 Features
 
-- **Multiple Drivers**: Database, Redis, Beanstalkd, Amazon SQS, and synchronous drivers
-- **Job Processing**: Robust background job processing with retry mechanisms
-- **Failed Job Handling**: Comprehensive failed job tracking and retry functionality
-- **Queue Workers**: Efficient long-running worker processes with memory management
-- **Job Batching**: Group related jobs together and track collective progress
-- **Delayed Jobs**: Schedule jobs to run at specific times or after delays
-- **Job Middleware**: Process jobs through middleware pipelines
-- **Rate Limiting**: Control job processing rates and prevent system overload
+- **Fluent Interface**: Chainable methods for elegant data manipulation
+- **Lazy Collections**: Memory-efficient processing of large datasets
+- **Array Utilities**: Comprehensive array manipulation functions via Arr class
+- **Type Safety**: Full generic type support for better IDE integration
+- **Functional Programming**: Map, filter, reduce, and other functional methods
+- **Data Transformation**: Convert between arrays, objects, and collections seamlessly
+- **Helper Functions**: Global helper functions like `collect()` for convenience
+- **Enumerable Interface**: Consistent API across Collection and LazyCollection
 
 ## 📖 Documentation
 
@@ -64,13 +64,13 @@ If you discover any bugs or issues, please report them in the main repository:
 
 ## 📄 License
 
-The Kasi Queue component is open-sourced software licensed under the [MIT license](LICENSE.md).
+The Kasi Collections component is open-sourced software licensed under the [MIT license](LICENSE.md).
 
 ## 🏢 About
 
-Kasi Queue is developed and maintained by [Jetstream Labs](https://jetstreamlabs.com) as part of the Kasi Framework.
+Kasi Collections is developed and maintained by [Jetstream Labs](https://jetstreamlabs.com) as part of the Kasi Framework.
 
-This component is a port of [illuminate/queue](https://github.com/illuminate/queue), originally created by [Taylor Otwell](https://github.com/taylorotwell) and The Laravel Team.
+This component is a port of [illuminate/collections](https://github.com/illuminate/collections), originally created by [Taylor Otwell](https://github.com/taylorotwell) and The Laravel Team.
 
 ---
 

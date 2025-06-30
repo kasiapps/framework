@@ -1,9 +1,9 @@
-# Kasi Queue
+# Kasi Pipeline
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/kasi/queue.svg?style=flat)](https://packagist.org/packages/kasi/queue)
-[![Total Downloads](https://img.shields.io/packagist/dt/kasi/queue.svg?style=flat)](https://packagist.org/packages/kasi/queue)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/kasi/pipeline.svg?style=flat)](https://packagist.org/packages/kasi/pipeline)
+[![Total Downloads](https://img.shields.io/packagist/dt/kasi/pipeline.svg?style=flat)](https://packagist.org/packages/kasi/pipeline)
 
-The Kasi Queue component provides a unified API for background job processing in PHP applications. This component allows you to defer time-consuming tasks to background workers, dramatically improving application response times and user experience.
+The Kasi Pipeline component provides a pipeline pattern implementation for PHP applications. This component allows you to pass data through a series of processing stages in a clean and organized manner.
 
 ## ⚠️ Read-Only Repository
 
@@ -24,19 +24,19 @@ For contributions, bug reports, feature requests, and discussions, please visit 
 You can install the component via Composer:
 
 ```bash
-composer require kasi/queue
+composer require kasi/pipeline
 ```
 
 ## 🚀 Features
 
-- **Multiple Drivers**: Database, Redis, Beanstalkd, Amazon SQS, and synchronous drivers
-- **Job Processing**: Robust background job processing with retry mechanisms
-- **Failed Job Handling**: Comprehensive failed job tracking and retry functionality
-- **Queue Workers**: Efficient long-running worker processes with memory management
-- **Job Batching**: Group related jobs together and track collective progress
-- **Delayed Jobs**: Schedule jobs to run at specific times or after delays
-- **Job Middleware**: Process jobs through middleware pipelines
-- **Rate Limiting**: Control job processing rates and prevent system overload
+- **Pipeline Pattern**: Clean implementation of the pipeline design pattern
+- **Middleware Support**: Process data through middleware-style pipes
+- **Flexible Pipes**: Support for closures, objects, and class-based pipes
+- **Method Customization**: Customize the method called on each pipe
+- **Exception Handling**: Robust error handling throughout the pipeline
+- **Container Integration**: Automatic dependency injection for pipe classes
+- **Hub Support**: Manage multiple named pipelines through a central hub
+- **Performance Optimized**: Efficient pipeline execution with minimal overhead
 
 ## 📖 Documentation
 
@@ -64,13 +64,13 @@ If you discover any bugs or issues, please report them in the main repository:
 
 ## 📄 License
 
-The Kasi Queue component is open-sourced software licensed under the [MIT license](LICENSE.md).
+The Kasi Pipeline component is open-sourced software licensed under the [MIT license](LICENSE.md).
 
 ## 🏢 About
 
-Kasi Queue is developed and maintained by [Jetstream Labs](https://jetstreamlabs.com) as part of the Kasi Framework.
+Kasi Pipeline is developed and maintained by [Jetstream Labs](https://jetstreamlabs.com) as part of the Kasi Framework.
 
-This component is a port of [illuminate/queue](https://github.com/illuminate/queue), originally created by [Taylor Otwell](https://github.com/taylorotwell) and The Laravel Team.
+This component is a port of [illuminate/pipeline](https://github.com/illuminate/pipeline), originally created by [Taylor Otwell](https://github.com/taylorotwell) and The Laravel Team.
 
 ---
 
