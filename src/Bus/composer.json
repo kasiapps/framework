@@ -1,0 +1,32 @@
+{
+    "name": "kasi/bus",
+    "description": "The Kasi Bus component.",
+    "license": "MIT",
+    "homepage": "https://kasiapp.com",
+    "support": {
+        "issues": "https://github.com/kasiapps/framework/issues",
+        "source": "https://github.com/kasiapps/framework"
+    },
+    "require": {
+        "php": "^8.3",
+        "kasi/collections": "^1.0",
+        "kasi/contracts": "^1.0",
+        "kasi/pipeline": "^1.0",
+        "kasi/queue": "^1.0",
+        "kasi/support": "^11.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Kasi\\Bus\\": ""
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.x-dev"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev"
+}

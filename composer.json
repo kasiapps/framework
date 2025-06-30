@@ -1,0 +1,107 @@
+{
+	"name": "kasi/framework",
+	"description": "The PHP Backend Framework for Kasi.",
+	"keywords": ["framework", "kasi", "inertia"],
+	"license": "MIT",
+	"homepage": "https://kasiapp.com",
+	"support": {
+		"issues": "https://github.com/kasiapps/framework/issues",
+		"source": "https://github.com/kasiapps/framework"
+	},
+	"require": {
+		"php": "^8.3",
+		"composer-runtime-api": "^2.2",
+		"dragonmantank/cron-expression": "^3.1",
+		"nikic/fast-route": "^1.3",
+		"symfony/console": "^7.0",
+		"symfony/error-handler": "^7.0",
+		"symfony/http-kernel": "^7.0",
+		"symfony/http-foundation": "^7.0",
+		"symfony/mime": "^7.0",
+		"symfony/var-dumper": "^7.0",
+		"vlucas/phpdotenv": "^5.4.1"
+	},
+	"replace": {
+		"kasi/auth": "self.version",
+    "kasi/broadcasting": "self.version",
+    "kasi/bus": "self.version",
+    "kasi/cache": "self.version",
+    "kasi/collections": "self.version",
+    "kasi/conditionable": "self.version",
+    "kasi/config": "self.version",
+    "kasi/console": "self.version",
+    "kasi/container": "self.version",
+    "kasi/contracts": "self.version",
+    "kasi/database": "self.version",
+    "kasi/encryption": "self.version",
+    "kasi/events": "self.version",
+    "kasi/filesystem": "self.version",
+    "kasi/hashing": "self.version",
+    "kasi/http": "self.version",
+    "kasi/log": "self.version",
+    "kasi/macroable": "self.version",
+    "kasi/pagination": "self.version",
+    "kasi/pipeline": "self.version",
+    "kasi/prompts": "self.version",
+    "kasi/queue": "self.version",
+    "kasi/redis": "self.version",
+    "kasi/serializable-closure": "self.version",
+    "kasi/session": "self.version",
+    "kasi/support": "self.version",
+    "kasi/testing": "self.version",
+    "kasi/translation": "self.version",
+    "kasi/validation": "self.version",
+    "kasi/view": "self.version"
+	},
+	"require-dev": {
+		"kasi/tinker": "self.version",
+    "mockery/mockery": "^1.6.12",
+    "pestphp/pest": "^3.8",
+    "rector/rector": "^2.1",
+    "zenphp/fixr": "^1.0"
+	},
+	"suggest": {
+		"nyholm/psr7": "Required to use PSR-7 bridging features (^1.2).",
+		"symfony/psr-http-message-bridge": "Required to use PSR-7 bridging features (^2.0)."
+	},
+	"autoload": {
+		"psr-4": {
+			"Kasi\\": "src/",
+			"Kasi\\Support\\": [
+				"src/Macroable/",
+				"src/Collections/",
+				"src/Conditionable/"
+			]
+		},
+		"files": [
+			"src/Foundation/helpers.php",
+			"src/Collections/functions.php",
+			"src/Collections/helpers.php",
+			"src/Events/functions.php",
+			"src/Filesystem/functions.php",
+			"src/Log/functions.php",
+			"src/Support/functions.php",
+			"src/Support/helpers.php"
+		]
+	},
+	"scripts": {
+		"fix": "vendor/bin/fixr",
+    "test": "pest",
+    "test:coverage": "pest --coverage --min=95",
+    "analyse": "phpstan analyse",
+    "analyse:fix": "phpstan analyse --generate-baseline"
+  },
+	"config": {
+    "sort-packages": true,
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
+  },
+	"extra": {
+		"branch-alias": {
+			"dev-master": "1.x-dev"
+		}
+	},
+	"minimum-stability": "stable",
+	"prefer-stable": true
+}

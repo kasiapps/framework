@@ -1,0 +1,32 @@
+{
+    "name": "kasi/encryption",
+    "description": "The Kasi Encryption component.",
+    "license": "MIT",
+    "homepage": "https://kasiapp.com",
+    "support": {
+        "issues": "https://github.com/kasiapps/framework/issues",
+        "source": "https://github.com/kasiapps/framework"
+    },
+    "require": {
+        "php": "^8.3",
+        "ext-hash": "*",
+        "ext-mbstring": "*",
+        "ext-openssl": "*",
+        "kasi/contracts": "^1.0",
+        "kasi/support": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Kasi\\Encryption\\": ""
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.x-dev"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev"
+}

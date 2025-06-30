@@ -1,0 +1,40 @@
+{
+    "name": "kasi/validation",
+    "description": "The Kasi Validation component.",
+    "license": "MIT",
+    "homepage": "https://kasiapp.com",
+    "support": {
+        "issues": "https://github.com/kasiapps/framework/issues",
+        "source": "https://github.com/kasiapps/framework"
+    },
+    "require": {
+        "php": "^8.3",
+        "ext-filter": "*",
+        "ext-mbstring": "*",
+        "brick/math": "^0.9.3|^0.10.2|^0.11|^0.12",
+        "egulias/email-validator": "^3.2.5|^4.0",
+        "kasi/collections": "^1.0",
+        "kasi/container": "^1.0",
+        "kasi/contracts": "^1.0",
+        "kasi/database": "^1.0",
+        "kasi/macroable": "^1.0",
+        "kasi/support": "^1.0",
+        "kasi/translation": "^1.0",
+        "symfony/http-foundation": "^7.0",
+        "symfony/mime": "^7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Kasi\\Validation\\": ""
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.x-dev"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev"
+}

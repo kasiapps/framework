@@ -1,0 +1,44 @@
+{
+    "name": "kasi/database",
+    "description": "The Kasi Database component.",
+    "license": "MIT",
+    "homepage": "https://kasiapp.com",
+    "support": {
+        "issues": "https://github.com/kasiapps/framework/issues",
+        "source": "https://github.com/kasiapps/framework"
+    },
+    "require": {
+        "php": "^8.3",
+        "ext-pdo": "*",
+        "brick/math": "^0.9.3|^0.10.2|^0.11|^0.12",
+        "kasi/collections": "^1.0",
+        "kasi/console": "^1.0",
+        "kasi/container": "^1.0",
+        "kasi/contracts": "^1.0",
+        "kasi/events": "^1.0",
+        "kasi/filesystem": "^1.0",
+        "kasi/macroable": "^1.0",
+        "kasi/pagination": "^1.0",
+				"kasi/serializable-closure": "^2.0",
+        "kasi/support": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Kasi\\Database\\": ""
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.x-dev"
+        }
+    },
+    "suggest": {
+        "ext-filter": "Required to use the Postgres database driver.",
+        "fakerphp/faker": "Required to use the eloquent factory builder (^1.24).",
+        "symfony/finder": "Required to use Eloquent model factories (^7.0)."
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev"
+}

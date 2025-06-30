@@ -1,0 +1,4 @@
+vendor/
+CHANGELOG.md
+composer.lock
+bun.lock

@@ -1,0 +1,17 @@
+<?php
+
+namespace {{ namespace }};
+
+use Kasi\Database\Console\Seeds\WithoutModelEvents;
+use Kasi\Database\Seeder;
+
+class {{ class }} extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        //
+    }
+}

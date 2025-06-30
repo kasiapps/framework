@@ -1,0 +1,32 @@
+{
+    "name": "kasi/container",
+    "description": "The Kasi Container component.",
+    "license": "MIT",
+    "homepage": "https://kasiapp.com",
+    "support": {
+        "issues": "https://github.com/kasiapps/framework/issues",
+        "source": "https://github.com/kasiapps/framework"
+    },
+    "require": {
+        "php": "^8.3",
+        "kasi/contracts": "^1.0",
+        "psr/container": "^1.1.1|^2.0.1"
+    },
+    "provide": {
+        "psr/container-implementation": "1.1|2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Kasi\\Container\\": ""
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.x-dev"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev"
+}

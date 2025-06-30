@@ -1,0 +1,34 @@
+{
+    "name": "kasi/log",
+    "description": "The Kasi Log component.",
+    "license": "MIT",
+    "homepage": "https://kasiapp.com",
+    "support": {
+        "issues": "https://github.com/kasiapps/framework/issues",
+        "source": "https://github.com/kasiapps/framework"
+    },
+    "require": {
+        "php": "^8.3",
+        "kasi/contracts": "^1.0",
+        "kasi/support": "^1.0",
+        "monolog/monolog": "^3.0",
+        "psr/log": "^1.0|^2.0|^3.0"
+    },
+    "provide": {
+        "psr/log-implementation": "1.0|2.0|3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Kasi\\Log\\": ""
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.x-dev"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev"
+}

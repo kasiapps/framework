@@ -1,0 +1,36 @@
+{
+    "name": "kasi/prompts",
+    "description": "The Kasi Prompts component.",
+    "license": "MIT",
+		"homepage": "https://kasiapp.com",
+    "support": {
+        "issues": "https://github.com/kasiapps/framework/issues",
+        "source": "https://github.com/kasiapps/framework"
+    },
+    "require": {
+        "php": "^8.3",
+        "ext-mbstring": "*",
+        "composer-runtime-api": "^2.2",
+        "symfony/console": "^6.2|^7.0"
+    },
+		"autoload": {
+        "psr-4": {
+            "Kasi\\Prompts\\": "src/"
+        },
+        "files": [
+            "src/helpers.php"
+        ]
+    },
+    "suggest": {
+        "ext-pcntl": "Required for the spinner to be animated."
+    },
+    "config": {
+				"sort-packages": true
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "1.x-dev"
+        }
+    },
+    "minimum-stability": "dev"
+}

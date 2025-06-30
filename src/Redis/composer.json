@@ -1,0 +1,35 @@
+{
+    "name": "kasi/redis",
+    "description": "The Kasi Redis component.",
+    "license": "MIT",
+    "homepage": "https://kasiapp.com",
+    "support": {
+        "issues": "https://github.com/kasiapps/framework/issues",
+        "source": "https://github.com/kasiapps/framework"
+    },
+    "require": {
+        "php": "^8.3",
+        "kasi/collections": "^1.0",
+        "kasi/contracts": "^1.0",
+        "kasi/macroable": "^1.0",
+        "kasi/support": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Kasi\\Redis\\": ""
+        }
+    },
+    "suggest": {
+        "ext-redis": "Required to use the phpredis connector (^4.0|^5.0|^6.0).",
+        "predis/predis": "Required to use the predis connector (^2.3)."
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.x-dev"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev"
+}

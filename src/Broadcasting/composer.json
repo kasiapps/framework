@@ -1,0 +1,39 @@
+{
+    "name": "kasi/broadcasting",
+    "description": "The Kasi Broadcasting component.",
+    "license": "MIT",
+    "homepage": "https://kasiapp.com",
+    "support": {
+        "issues": "https://github.com/kasiapps/framework/issues",
+        "source": "https://github.com/kasiapps/framework"
+    },
+    "require": {
+        "php": "^8.3",
+        "psr/log": "^1.0|^2.0|^3.0",
+        "kasi/bus": "^1.0",
+        "kasi/collections": "^1.0",
+        "kasi/container": "^1.0",
+        "kasi/contracts": "^1.0",
+        "kasi/queue": "^1.0",
+        "kasi/support": "^11.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Kasi\\Broadcasting\\": ""
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.x-dev"
+        }
+    },
+    "suggest": {
+        "ext-hash": "Required to use the Ably and Pusher broadcast drivers.",
+        "ably/ably-php": "Required to use the Ably broadcast driver (^1.0).",
+        "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (^6.0|^7.0)."
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev"
+}

@@ -1,0 +1,43 @@
+{
+    "name": "kasi/cache",
+    "description": "The Kasi Cache component.",
+    "license": "MIT",
+    "homepage": "https://kasiapp.com",
+    "support": {
+        "issues": "https://github.com/kasiapps/framework/issues",
+        "source": "https://github.com/kasiapps/framework"
+    },
+    "require": {
+        "php": "^8.3",
+        "kasi/collections": "^1.0",
+        "kasi/contracts": "^1.0",
+        "kasi/database": "^1.0",
+        "kasi/filesystem": "^1.0",
+        "kasi/macroable": "^1.0",
+        "kasi/redis": "^1.0",
+        "kasi/support": "^1.0"
+    },
+    "provide": {
+        "psr/simple-cache-implementation": "1.0|2.0|3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Kasi\\Cache\\": ""
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.x-dev"
+        }
+    },
+    "suggest": {
+        "ext-apcu": "Required to use the APC cache driver.",
+        "ext-filter": "Required to use the DynamoDb cache driver.",
+        "ext-memcached": "Required to use the memcache cache driver.",
+        "symfony/cache": "Required to use PSR-6 cache bridge (^7.0)."
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev"
+}
