@@ -27,6 +27,28 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+
+      - name: Compile splitsh-lite
+        run: |
+          # Install required packages for libgit2 (use Ubuntu 22.04 compatible version)
+          sudo apt-get update
+          sudo apt-get install -y libgit2-1.1-dev pkg-config build-essential
+
+          # Clone and compile splitsh-lite
+          git clone https://github.com/splitsh/lite.git splitsh-lite-source
+          cd splitsh-lite-source
+          go build -o ../bin/splitsh-lite github.com/splitsh/lite
+          cd ..
+          rm -rf splitsh-lite-source
+
+          # Make executable and verify
+          chmod +x bin/splitsh-lite
+          ./bin/splitsh-lite --version
+
       - name: Run split script
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
