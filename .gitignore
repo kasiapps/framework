@@ -4,6 +4,7 @@
 /.vscode
 /phpunit.xml
 /.phpunit.cache
+/bin/update-splitsh-lite.sh
 .phpunit.result.cache
 coverage.md
 bun.lock

@@ -27,15 +27,6 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install missing SSL libraries
-        run: |
-          # Install SSL libraries - try both libssl3 (Ubuntu 24.04) and create symlink for older binary
-          sudo apt-get update
-          sudo apt-get install -y libssl3 libssl-dev
-          # Create symlink for older binary compatibility
-          sudo ln -sf /usr/lib/x86_64-linux-gnu/libssl.so.3 /usr/lib/x86_64-linux-gnu/libssl.so.1.1 || true
-          sudo ln -sf /usr/lib/x86_64-linux-gnu/libcrypto.so.3 /usr/lib/x86_64-linux-gnu/libcrypto.so.1.1 || true
-
       - name: Run split script
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
