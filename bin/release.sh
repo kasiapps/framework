@@ -82,7 +82,7 @@ do
     echo "Split SHA1 for $REMOTE: $SHA1"
 
     # Push the tag to the component repository
-    REMOTE_URL="https://${GITHUB_TOKEN}@github.com/$REMOTE.git"
+    REMOTE_URL="https://${GITHUB_TOKEN}@github.com/kasiapps/$REMOTE.git"
     git push "$REMOTE_URL" "$SHA1:refs/tags/$VERSION"
 
     echo "Successfully tagged $REMOTE with $VERSION"

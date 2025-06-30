@@ -39,9 +39,11 @@ function split()
 
     echo "Split SHA1 for $REMOTE_NAME: $SHA1"
 
-    # Configure git for CI if needed - use commit author info
-    git config --global user.email "$(git log -1 --pretty=format:'%ae')" 2>/dev/null || true
-    git config --global user.name "$(git log -1 --pretty=format:'%an')" 2>/dev/null || true
+    # Convert SSH URL to HTTPS with token for CI
+    if [[ "$REMOTE_URL" == git@github.com:* ]]; then
+        HTTPS_URL="https://${GITHUB_TOKEN}@github.com/${REMOTE_URL#git@github.com:}"
+        REMOTE_URL="$HTTPS_URL"
+    fi
 
     # Push either tag or branch
     if [ -n "$TAG" ]; then
@@ -57,6 +59,10 @@ function remote()
 {
     git remote add $1 $2 2>/dev/null || true
 }
+
+# Configure git for CI if needed - use commit author info
+git config --global user.email "$(git log -1 --pretty=format:'%ae')" 2>/dev/null || true
+git config --global user.name "$(git log -1 --pretty=format:'%an')" 2>/dev/null || true
 
 # Only pull if we're doing branch operations (not tags)
 if [ -z "$TAG" ]; then

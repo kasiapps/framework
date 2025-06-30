@@ -24,6 +24,8 @@ on:
 jobs:
   split:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout code
@@ -36,6 +38,17 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          set -e  # Exit on any error
+
+          # Verify GITHUB_TOKEN is available
+          if [ -z "$GITHUB_TOKEN" ]; then
+            echo "Error: GITHUB_TOKEN is not set"
+            exit 1
+          fi
+
+          # Make scripts executable
+          chmod +x ./bin/split.sh ./bin/release.sh ./bin/splitsh-lite
+
           # Check if this was called from main workflow with release info
           if [[ "${{ inputs.released }}" == "true" && -n "${{ inputs.version }}" ]]; then
             echo "Release detected from main workflow: ${{ inputs.version }}"
