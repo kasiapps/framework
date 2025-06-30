@@ -1,13 +1,6 @@
 name: 'Framework Subsplit'
 
 on:
-  push:
-    branches:
-      - main
-    tags:
-      - 'v*'
-  release:
-    types: [published]
   workflow_call:
     inputs:
       released:
@@ -33,6 +26,12 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install missing SSL libraries
+        run: |
+          # Install the missing libssl library that splitsh-lite needs
+          sudo apt-get update
+          sudo apt-get install -y libssl1.1
 
       - name: Run split script
         env:

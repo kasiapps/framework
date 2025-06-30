@@ -1,13 +1,13 @@
 name: Testing
 
 on:
-  push:
-    branches:
-      - main
-      - '*.x'
-  pull_request:
-  schedule:
-    - cron: '0 0 * * *'
+  workflow_call:
+    inputs:
+      ref:
+        description: 'The ref to test'
+        required: false
+        type: string
+        default: ''
 
 jobs:
   tests:
@@ -22,6 +22,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
+          ref: ${{ inputs.ref }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup PHP
